@@ -1,0 +1,17 @@
+{
+  "projectId": "REPLACE_ME",
+  "region": "eu-central-1",
+  "postgres": true,
+  "email": true,
+  "storage": { "cloudfront": "media" },
+  "mqtt": false,
+  "functions": [
+    { "name": "api-chat", "runtime": "nodejs24.x", "memory": 512, "timeout": 60 },
+    { "name": "api-availability", "runtime": "nodejs24.x", "memory": 512, "timeout": 30 },
+    { "name": "api-bookings", "runtime": "nodejs24.x", "memory": 512, "timeout": 30 },
+    { "name": "api-contact", "runtime": "nodejs24.x", "memory": 512, "timeout": 30 },
+    { "name": "api-cleanup", "runtime": "nodejs24.x", "memory": 256, "timeout": 60, "schedule": "rate(1 hour)" }
+  ],
+  "site": "./site",
+  "spa": "/index.html"
+}
