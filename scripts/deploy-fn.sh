@@ -18,6 +18,8 @@ repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 fn_dir="$repo_root/functions/$fn"
 shared_src="$repo_root/functions/_shared"
 env_file="$repo_root/.env.local"
+config_file="$repo_root/config.json"
+career_file="$repo_root/assets/career.json"
 
 if [[ ! -d "$fn_dir" ]]; then
   echo "no such function: $fn_dir" >&2
@@ -27,15 +29,25 @@ if [[ ! -f "$env_file" ]]; then
   echo "missing .env.local at repo root" >&2
   exit 1
 fi
+if [[ ! -f "$config_file" ]]; then
+  echo "missing config.json at repo root" >&2
+  exit 1
+fi
+if [[ ! -f "$career_file" ]]; then
+  echo "missing assets/career.json at repo root" >&2
+  exit 1
+fi
 
 cleanup() {
   rm -rf "$fn_dir/_shared" "$fn_dir/_env.mjs"
 }
 trap cleanup EXIT
 
-# 1. Copy _shared/ into the function dir
+# 1. Copy _shared/ into the function dir (with config.json + career.json bundled alongside)
 rm -rf "$fn_dir/_shared"
 cp -r "$shared_src" "$fn_dir/_shared"
+cp "$config_file" "$fn_dir/_shared/config.json"
+cp "$career_file" "$fn_dir/_shared/career.json"
 
 # 2. Render .env.local into _env.mjs (each KEY=VALUE becomes process.env.KEY = 'VALUE')
 {

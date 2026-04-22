@@ -1,9 +1,9 @@
 /**
  * Verify a Google-issued ID token (from Google Identity Services on the frontend).
  *
- * Replaces NextAuth for the ask-ivo OpenKBS port. The browser gets an id_token
- * via GIS, sends it as `Authorization: Bearer <id_token>`, and we verify the
- * signature against Google's JWKS + basic claims (iss, aud, exp).
+ * The browser obtains an id_token via GIS, sends it as
+ * `Authorization: Bearer <id_token>`, and we verify the signature against
+ * Google's JWKS + basic claims (iss, aud, exp).
  *
  * Returns { sub, email, name, picture } on success. Throws on failure.
  */

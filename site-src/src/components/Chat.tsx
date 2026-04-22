@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { MessageBubble, type ChatMessage } from "./MessageBubble";
+import { config } from "../config";
 
 function generateId() {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
 
-const STARTER_PROMPTS = [
-  "Tell me about your work",
-  "Are you free this week?",
-  "Book a call",
-  "Send a message",
-];
+const STARTER_PROMPTS = config.starterPrompts;
 
 export function Chat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -72,15 +68,17 @@ export function Chat() {
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 px-2">
             <img
-              src="/media/ivo.png"
-              alt="Ivo Stoynovski"
+              src={config.branding.avatarUrl}
+              alt={config.owner.name}
               width={96}
               height={96}
               className="rounded-full object-cover object-top w-24 h-24"
             />
-            <p className="text-lg md:text-xl font-medium text-foreground/70">Hey, I&apos;m Ivo!</p>
+            <p className="text-lg md:text-xl font-medium text-foreground/70">
+              Hey, I&apos;m {config.owner.firstName}!
+            </p>
             <p className="text-sm text-foreground/60 text-center">
-              Senior Software Engineer · Sofia · 8+ years, blockchain &amp; AI
+              {config.owner.bioTagline}
             </p>
             <p className="text-sm md:text-base text-foreground/50 text-center">
               Skip the resume — ask me anything in plain language.

@@ -1,14 +1,25 @@
 /**
- * Email templates — ported from src/lib/emails.ts.
+ * Email sender — templates live in config.emails (Mustache-lite).
  *
- * Uses OpenKBS email service (not Resend). Plain fetch against
+ * Uses OpenKBS email service. Plain fetch against
  * https://project.openkbs.com/projects/{id}/email/send with API key auth.
+ *
+ * Template syntax:
+ *   {{path.to.var}}   → HTML-escaped when used in an HTML body
+ *   {{{path.to.var}}} → raw (for pre-built HTML chunks like the topic block)
+ *   Text bodies never escape — {{var}} and {{{var}}} both render raw.
  */
 
 import { signAction } from './booking-token.mjs';
+import { getConfig } from './config.mjs';
 
-const OWNER_EMAIL = process.env.CONTACT_EMAIL ?? 'ivostoynovski@gmail.com';
+const { owner, branding, emails } = getConfig();
+const OWNER_EMAIL = process.env.CONTACT_EMAIL;
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000';
+
+if (!OWNER_EMAIL) {
+  console.warn('CONTACT_EMAIL env var not set — owner-bound emails will fail.');
+}
 
 function esc(value) {
   return String(value ?? '')
@@ -17,6 +28,24 @@ function esc(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function resolvePath(vars, path) {
+  return path.split('.').reduce((v, k) => (v == null ? v : v[k]), vars);
+}
+
+function renderTemplate(template, vars, { html = false } = {}) {
+  return template
+    // Triple-brace = raw, process first so double-brace doesn't steal it
+    .replace(/\{\{\{([\w.]+)\}\}\}/g, (_, path) => {
+      const v = resolvePath(vars, path);
+      return v == null ? '' : String(v);
+    })
+    .replace(/\{\{([\w.]+)\}\}/g, (_, path) => {
+      const v = resolvePath(vars, path);
+      if (v == null) return '';
+      return html ? esc(v) : String(v);
+    });
 }
 
 async function sendEmail({ to, subject, html, text }) {
@@ -42,80 +71,62 @@ async function sendEmail({ to, subject, html, text }) {
   return resText ? JSON.parse(resText) : null;
 }
 
+function baseVars() {
+  return {
+    firstName: owner.firstName,
+    name: owner.name,
+    siteName: branding.siteName,
+  };
+}
+
 export async function sendApprovalRequestEmail(booking) {
   const approveSig = signAction(booking.id, 'approve');
   const rejectSig = signAction(booking.id, 'reject');
   const approveUrl = `${APP_URL}/api-bookings?action=approve&id=${booking.id}&sig=${approveSig}`;
   const rejectUrl = `${APP_URL}/api-bookings?action=reject&id=${booking.id}&sig=${rejectSig}`;
 
-  const topic = booking.topic
+  const topicBlock = booking.topic
     ? `<p><strong>Topic:</strong> ${esc(booking.topic)}</p>`
     : '';
 
+  const vars = {
+    ...baseVars(),
+    booking,
+    approveUrl,
+    rejectUrl,
+    topicBlock,
+  };
+
   await sendEmail({
     to: OWNER_EMAIL,
-    subject: `Booking request from ${booking.name}`,
-    html: `
-      <h2>New booking request</h2>
-      <p><strong>Name:</strong> ${esc(booking.name)}</p>
-      <p><strong>Email:</strong> ${esc(booking.email)}</p>
-      <p><strong>Date:</strong> ${esc(booking.date)}</p>
-      <p><strong>Time:</strong> ${esc(booking.start_time)}</p>
-      <p><strong>Duration:</strong> ${esc(booking.duration)} minutes</p>
-      ${topic}
-      <br/>
-      <p>
-        <a href="${esc(approveUrl)}" style="background:#2563eb;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;margin-right:10px;">Approve</a>
-        <a href="${esc(rejectUrl)}" style="background:#dc2626;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">Reject</a>
-      </p>
-    `,
+    subject: renderTemplate(emails.approvalRequest.subject, vars),
+    html: renderTemplate(emails.approvalRequest.html, vars, { html: true }),
   });
 }
 
 export async function sendBookingConfirmedEmail(booking) {
+  const vars = { ...baseVars(), booking };
   await sendEmail({
     to: booking.email,
-    subject: 'Your call with Ivo is confirmed!',
-    text: `Hi ${booking.name},
-
-Your call with Ivo has been confirmed.
-
-Date: ${booking.date}
-Time: ${booking.start_time}
-Duration: ${booking.duration} minutes
-
-You will receive a Google Calendar invite with the meeting details.
-
-See you then!
-Ivo`,
+    subject: renderTemplate(emails.bookingConfirmed.subject, vars),
+    text: renderTemplate(emails.bookingConfirmed.text, vars),
   });
 }
 
 export async function sendBookingRejectedEmail(booking) {
+  const vars = { ...baseVars(), booking };
   await sendEmail({
     to: booking.email,
-    subject: 'Booking update from Ivo',
-    text: `Hi ${booking.name},
-
-Unfortunately, Ivo is unable to make the requested time slot (${booking.date} at ${booking.start_time}).
-
-Please feel free to book a different time on the website.
-
-Best,
-Ivo`,
+    subject: renderTemplate(emails.bookingRejected.subject, vars),
+    text: renderTemplate(emails.bookingRejected.text, vars),
   });
 }
 
 export async function sendContactMessageEmail({ name, email, message }) {
+  const vars = { ...baseVars(), name, email, message };
   await sendEmail({
     to: OWNER_EMAIL,
-    subject: `Contact form: ${name}`,
-    html: `
-      <h2>New message from ask-ivo contact form</h2>
-      <p><strong>Name:</strong> ${esc(name)}</p>
-      <p><strong>Email:</strong> ${esc(email)}</p>
-      <p><strong>Message:</strong></p>
-      <p style="white-space: pre-wrap;">${esc(message)}</p>
-    `,
+    subject: renderTemplate(emails.contactMessage.subject, vars),
+    html: renderTemplate(emails.contactMessage.html, vars, { html: true }),
   });
 }

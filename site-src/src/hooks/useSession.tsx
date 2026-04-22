@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { config } from "../config";
 
 type Status = "loading" | "authenticated" | "unauthenticated";
 
@@ -54,7 +55,7 @@ declare global {
   }
 }
 
-const STORAGE_KEY = "ask-ivo:session";
+const STORAGE_KEY = config.branding.sessionStorageKey;
 
 function decodeJwt(token: string): Record<string, unknown> | null {
   const parts = token.split(".");

@@ -13,6 +13,10 @@
  */
 
 import crypto from 'node:crypto';
+import { getConfig } from './config.mjs';
+
+const { owner } = getConfig();
+const TIMEZONE = owner.timezone;
 
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const CAL_BASE = 'https://www.googleapis.com/calendar/v3';
@@ -117,13 +121,16 @@ export async function createEvent({
   endDateTime,
   attendeeEmail,
 }) {
-  return calendarFetch(SCOPE_WRITE, '/calendars/ivostoynovski%40gmail.com/events', {
+  const writeCalendarId = process.env.GOOGLE_CALENDAR_WRITE_ID;
+  if (!writeCalendarId) throw new Error('GOOGLE_CALENDAR_WRITE_ID not set');
+  const encodedId = encodeURIComponent(writeCalendarId);
+  return calendarFetch(SCOPE_WRITE, `/calendars/${encodedId}/events`, {
     method: 'POST',
     body: JSON.stringify({
       summary,
       description: `${description}\n\nAttendee: ${attendeeEmail}`,
-      start: { dateTime: startDateTime, timeZone: 'Europe/Sofia' },
-      end: { dateTime: endDateTime, timeZone: 'Europe/Sofia' },
+      start: { dateTime: startDateTime, timeZone: TIMEZONE },
+      end: { dateTime: endDateTime, timeZone: TIMEZONE },
     }),
   });
 }

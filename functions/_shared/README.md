@@ -1,13 +1,16 @@
 # Shared helpers
 
-Modules here are ported from `ask-ivo-temp/ask-ivo/src/lib/` and copied into each function bundle at deploy time (see the port plan).
+Modules here are copied into each function bundle at deploy time by `scripts/deploy-fn.sh` (the `_shared/` directory is symlinked or bundled alongside each function's `index.mjs`).
 
-Planned files:
+Contents:
 
-- `auth.mjs` — Google JWKS verify for Bearer id_token (card 1YP1hQMT)
-- `google-calendar.mjs` — service-account freebusy + event create (card l1JlwGIw)
-- `availability.mjs` — 7-day slot generator, Europe/Sofia, 9-21 (card l1JlwGIw)
-- `bookings.mjs` — Postgres CRUD for bookings (card r5FHAwpo)
-- `booking-token.mjs` — HMAC approve/reject (card r5FHAwpo)
-- `emails.mjs` — 4 email templates via OpenKBS email service (card Sxj3nlpS)
-- `career.mjs` — owner data + `buildSystemPrompt()` (card F2xY3M2k)
+- `config.mjs` — loads `config.json` (owner identity, branding, social, prompts)
+- `db.mjs` — pool factory; `pg.Pool` in prod, PGlite shim for `npm run dev`
+- `auth.mjs` — Google JWKS verify for Bearer id_token
+- `google-calendar.mjs` — service-account freebusy + event create
+- `availability.mjs` — 7-day slot generator driven by `owner.timezone` + `owner.workingHours`
+- `bookings.mjs` — bookings CRUD via `db.mjs`
+- `booking-token.mjs` — HMAC approve/reject
+- `emails.mjs` — email templates via OpenKBS email service
+- `career.mjs` — career data + `buildSystemPrompt()`
+- `rate-limit.mjs` — per-visitor rate limiting via `db.mjs`

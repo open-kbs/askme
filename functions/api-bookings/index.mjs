@@ -1,14 +1,17 @@
 import './_env.mjs';
-import pg from 'pg';
 import { getUserFromEvent } from './_shared/auth.mjs';
 import { createBooking, getBooking, setStatus } from './_shared/bookings.mjs';
 import { verifyAction } from './_shared/booking-token.mjs';
 import { checkRateLimit, getClientIp } from './_shared/rate-limit.mjs';
 import { createEvent } from './_shared/google-calendar.mjs';
+import { getConfig } from './_shared/config.mjs';
+import { getPool } from './_shared/db.mjs';
 import {
   sendBookingConfirmedEmail,
   sendBookingRejectedEmail,
 } from './_shared/emails.mjs';
+
+const { branding } = getConfig();
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -55,25 +58,11 @@ p{color:#a0a0a0;margin:0;line-height:1.5;}
 </style></head><body><div><h1>${esc(heading)}</h1><p>${esc(message)}</p></div></body></html>`;
 }
 
-let pool;
 let schemaReady;
-
-function getPool() {
-  if (!pool && process.env.DATABASE_URL) {
-    pool = new pg.Pool({
-      connectionString: process.env.DATABASE_URL,
-      max: 3,
-      idleTimeoutMillis: 60_000,
-      ssl: { rejectUnauthorized: false },
-    });
-  }
-  return pool;
-}
 
 async function ensureSchema() {
   if (schemaReady) return schemaReady;
   const db = getPool();
-  if (!db) throw new Error('DATABASE_URL not configured');
   schemaReady = db.query(`
     CREATE TABLE IF NOT EXISTS bookings (
       id          text PRIMARY KEY,
@@ -218,7 +207,7 @@ async function approveBooking(booking) {
 
     await createEvent({
       summary: `Call with ${booking.name}`,
-      description: `Booked via Ask Ivo\n\nName: ${booking.name}\nEmail: ${booking.email}${booking.topic ? `\nTopic: ${booking.topic}` : ''}`,
+      description: `Booked via ${branding.siteName}\n\nName: ${booking.name}\nEmail: ${booking.email}${booking.topic ? `\nTopic: ${booking.topic}` : ''}`,
       startDateTime: `${isoDate}T${booking.start_time}:00`,
       endDateTime: `${isoDate}T${endTime}:00`,
       attendeeEmail: booking.email,

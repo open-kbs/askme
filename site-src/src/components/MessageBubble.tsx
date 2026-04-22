@@ -1,3 +1,5 @@
+import { config } from "../config";
+
 export type ToolPart = {
   toolName: string;
   input?: unknown;
@@ -26,7 +28,7 @@ function AvailabilityCard({ data }: { data: AvailabilityDay[] | unknown }) {
   return (
     <div className="rounded-lg bg-foreground/[0.04] border border-foreground/10 p-3 my-1 space-y-2">
       <p className="text-[10px] font-medium uppercase tracking-wider text-foreground/40">
-        Available slots (Sofia time)
+        Available slots ({config.owner.timezoneLabel})
       </p>
       {arr.map((day) => (
         <div key={day.date}>

@@ -1,30 +1,19 @@
 /**
- * Booking creation — ported from src/lib/bookings.ts.
+ * Booking creation + status updates. Persists to the pool returned by
+ * `db.mjs` (pg.Pool in prod, PGlite shim for `npm run dev`).
  *
- * Delta from Next.js version:
- *   - Postgres (pg.Pool via DATABASE_URL) instead of SQLite
- *   - freeBusyQuery (raw fetch) instead of googleapis
- *   - Nanoid replaced with crypto.randomBytes to avoid ESM-only dep
+ * `createBooking` also checks the owner's Google Calendar for conflicts
+ * and sends the approval-request email to the owner.
  */
 
-import pg from 'pg';
 import { randomBytes } from 'node:crypto';
 import { freeBusyQuery } from './google-calendar.mjs';
 import { sendApprovalRequestEmail } from './emails.mjs';
+import { getConfig } from './config.mjs';
+import { getPool } from './db.mjs';
 
-let pool;
-function getPool() {
-  if (!pool) {
-    if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not set');
-    pool = new pg.Pool({
-      connectionString: process.env.DATABASE_URL,
-      max: 3,
-      idleTimeoutMillis: 60_000,
-      ssl: { rejectUnauthorized: false },
-    });
-  }
-  return pool;
-}
+const { owner } = getConfig();
+const TIMEZONE = owner.timezone;
 
 function genId() {
   return randomBytes(12).toString('base64url');
@@ -58,13 +47,13 @@ export async function createBooking(input) {
       : date;
 
   const probe = new Date(`${isoDate}T12:00:00Z`);
-  const sofiaProbe = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Europe/Sofia',
+  const tzProbe = new Intl.DateTimeFormat('en-US', {
+    timeZone: TIMEZONE,
     hour: 'numeric',
     hour12: false,
   }).format(probe);
-  const sofiaOffset = parseInt(sofiaProbe, 10) - 12;
-  const offsetStr = `${sofiaOffset >= 0 ? '+' : '-'}${String(Math.abs(sofiaOffset)).padStart(2, '0')}:00`;
+  const tzOffset = parseInt(tzProbe, 10) - 12;
+  const offsetStr = `${tzOffset >= 0 ? '+' : '-'}${String(Math.abs(tzOffset)).padStart(2, '0')}:00`;
 
   const slotStart = new Date(`${isoDate}T${startTime}:00${offsetStr}`);
   const slotEnd = new Date(`${isoDate}T${endTime}:00${offsetStr}`);
@@ -74,7 +63,7 @@ export async function createBooking(input) {
       const freeBusy = await freeBusyQuery({
         timeMin: slotStart.toISOString(),
         timeMax: slotEnd.toISOString(),
-        timeZone: 'Europe/Sofia',
+        timeZone: TIMEZONE,
         calendarIds,
       });
       const calendars = freeBusy.calendars ?? {};
@@ -130,8 +119,7 @@ export async function createBooking(input) {
 
     return {
       success: true,
-      message:
-        "Booking request submitted! Ivo will review it and you'll receive an email confirmation.",
+      message: `Booking request submitted! ${owner.firstName} will review it and you'll receive an email confirmation.`,
     };
   } catch (err) {
     console.error('createBooking error:', err);

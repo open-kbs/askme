@@ -1,90 +1,140 @@
-# ask-ivo (OpenKBS port)
+# Personal AI Site — template
 
-Personal AI chatbot site — "Ask Ivo". Ported 1:1 from the Next.js / Vercel
-original (kept for reference at `ask-ivo-temp/ask-ivo/`) onto OpenKBS
-infrastructure: Lambda functions, Neon Postgres, S3 + CloudFront, OpenKBS
-email service, OpenKBS AI proxy.
+An open-source template for a chat-first personal website. Visitors chat
+with an AI version of you that can check your calendar, request bookings,
+and pass along contact messages. Clone it, personalize it, run it locally.
 
-Live: https://d17hv7k5p5gs44.cloudfront.net
+> **Status — v1 (local-first).** The full template runs end-to-end on
+> your laptop: embedded Postgres, in-process Lambda runner, live LLM
+> proxy, Google Calendar integration. One-command deploy to OpenKBS is
+> planned for v2 — for now this is for exploring, customizing, and
+> running locally.
+
+## What you get
+
+- **Chat with tools** — an LLM persona of the site owner, wired to three
+  tools: `checkAvailability`, `createBooking`, `sendMessage`.
+- **Calendar panel** — free/busy read from the owner's Google Calendar
+  via a service account; visitor sign-in (Google Identity Services) to
+  request a slot.
+- **Two-phase booking** — visitor requests a slot → HMAC-signed
+  approve/reject links hit the owner's inbox → confirmation email to the
+  visitor on approve.
+- **Contact form** — rate-limited, honeypot-protected.
+- **Setup wizard** — a `/setup` page (loopback-only) that writes
+  `config.json` and `.env.local` for you, with live-test buttons for
+  each credential.
+
+## Prerequisites
+
+- **Node.js 20+** and **npm**.
+- **Google Cloud project** with:
+  - OAuth 2.0 Client ID (web) — for visitor sign-in
+  - Service account + JSON key — for Calendar read access
+  - Calendar API enabled
+- **OpenKBS API key** — for the LLM proxy. Get one at
+  [openkbs.com](https://openkbs.com).
+
+The setup wizard has "Test" buttons that verify each of these works
+before you save them.
+
+## Quickstart
+
+Two paths — pick whichever you prefer.
+
+### Option A — wizard (forms in a browser)
+
+```bash
+git clone <this-repo> my-site && cd my-site
+npm install
+npm run dev
+```
+
+Open http://localhost:5173 — if `config.json` still has placeholders,
+you'll be redirected to `/setup`. Fill the form, click each "Test"
+button, hit **Save**, and the app reloads with your data.
+
+### Option B — AI-guided (coding agent fills it in)
+
+If you use Claude Code, Cursor, Codex, or another coding agent, drop
+your `linkedin.pdf` in the repo root, then:
+
+```bash
+git clone <this-repo> my-site && cd my-site
+npm install
+# Open the repo in your coding agent and say: "set up this project"
+```
+
+The agent follows [`AGENTS.md`](./AGENTS.md): parses your PDF, writes
+`assets/career.json`, fills non-secret fields in `config.json`. Then you
+still run `npm run dev` and visit `/setup` to enter the Google and
+OpenKBS credentials (the agent intentionally doesn't touch those).
+
+## Development
+
+```bash
+npm run dev
+```
+
+Starts two processes:
+
+- **API** on `127.0.0.1:8787` — a Hono server that runs the Lambda
+  handlers in-process, backed by an embedded Postgres (PGlite) at
+  `./local/.pgdata/`.
+- **Web** on `127.0.0.1:5173` — Vite dev server with HMR, proxies
+  `/api-*` and `/api/setup` to the API.
+
+### Common customizations
+
+| What | Where |
+|---|---|
+| Owner name, title, location, bio | `config.json` → `owner.*` |
+| Career data (the AI's "knowledge") | `assets/career.json` |
+| Chat personality / tone rules | `config.json` → `systemPrompt.*` |
+| Starter prompt chips | `config.json` → `starterPrompts` |
+| Email subjects and bodies | `config.json` → `emails.*` |
+| Avatar and CV | `assets/avatar.png`, `assets/cv.pdf` |
+| Site name, logo text, meta description | `config.json` → `branding.*` |
+| Social links | `config.json` → `social.*` |
+
+### Resetting local state
+
+```bash
+rm -rf local/.pgdata      # wipes local Postgres (bookings, rate-limits)
+rm .env.local             # back to a fresh wizard
+```
 
 ## Layout
 
 ```
-./openkbs.json        project config (postgres, storage, email, functions)
-./site-src/           React + Vite + TS + Tailwind source
-./site/               Vite build output (deployed to S3 + CloudFront)
-./functions/
-  _shared/            shared helpers copied into each bundle at deploy time
-  chat/               POST /chat           AI chat + 3 tools (non-streaming)
-  availability/       GET  /availability   Google freebusy, Bearer id_token
-  bookings/           POST /bookings       create (Bearer)
-                      GET  /bookings?action=approve|reject  HMAC, HTML
-  contact/            POST /contact        email to owner
-./scripts/deploy-fn.sh          zip+deploy helper (copies _shared, bundles .env)
+config.json              Non-secret owner config (personalize here)
+.env.local               Secrets — gitignored; wizard writes this
+.env.example             Reference for .env.local
+assets/
+  career.json            Structured bio — the chat system prompt reads this
+  avatar.png, cv.pdf     Static assets
+functions/               Lambda handlers (run locally in-process)
+  _shared/               Shared modules: db, auth, emails, career, rate-limit
+  api-chat/              LLM chat + 3 tools
+  api-availability/      Google Calendar free-busy
+  api-bookings/          Create / approve / reject
+  api-contact/           Contact form
+  api-cleanup/           Cron: prune stale rate-limits + expired bookings
+site-src/                React + Vite + Tailwind source
+local/                   Dev harness (server, PGlite shim, setup backend)
+AGENTS.md                Agent-runnable personalization + dev guide
+CLAUDE.md                One-line pointer → AGENTS.md
 ```
 
-## Deploy
+## Deployment
 
-```bash
-openkbs deploy                   # Postgres, storage, email
-bash scripts/deploy-fn.sh chat
-bash scripts/deploy-fn.sh availability
-bash scripts/deploy-fn.sh bookings
-bash scripts/deploy-fn.sh contact
-cd site-src && npm run build && cd ..
-openkbs site deploy
-```
+Deferred to v2. The production target is [OpenKBS](https://openkbs.com)
+— Lambda functions, managed Postgres, SES, S3+CloudFront. Once the
+deploy pipeline lands, it'll be `npm run deploy` from a clean clone.
 
-`scripts/deploy-fn.sh` copies `functions/_shared/` into the target function
-and renders `.env.local` into `_env.mjs` (OpenKBS has no custom-env mechanism
-yet, so secrets are bundled).
+Until then, this is a template for local exploration and for running
+the full stack on your own machine.
 
-## Env (`.env.local` at repo root)
+## License
 
-- `GOOGLE_SERVICE_ACCOUNT_KEY`  base64-encoded service account JSON
-- `GOOGLE_CALENDAR_IDS`         comma-separated calendar IDs
-- `GOOGLE_OAUTH_CLIENT_ID`      GIS client id (frontend bake + server verify)
-- `BOOKING_SECRET`              HMAC for approve/reject links
-- `APP_URL`                     absolute site URL (used in emails)
-- `CONTACT_EMAIL`               where booking + contact emails land
-- `FROM_EMAIL`                  verified sender for OpenKBS email service
-
-`OPENKBS_API_KEY`, `OPENKBS_PROJECT_ID`, `DATABASE_URL` are injected by the
-platform.
-
-Frontend also needs `VITE_GOOGLE_CLIENT_ID` (same value as
-`GOOGLE_OAUTH_CLIENT_ID`) in `site-src/.env.local` — baked into the Vite
-bundle at build time.
-
-## Differences vs the Next.js original
-
-1. **No streaming chat.** Lambda can't stream a response body; chat uses a
-   single JSON round-trip (`{ text, toolParts }`). UX: typing-dot, then
-   full response.
-2. **No NextAuth.** Visitor sign-in uses Google Identity Services in the
-   browser; `id_token` is sent as `Authorization: Bearer <token>` to
-   protected endpoints. Server verifies against Google JWKS.
-3. **No Vercel AI SDK.** The `ai` + `@ai-sdk/openai` bundle is ~25 MB and
-   got rejected by the deploy API (413). Chat uses a raw OpenAI-compatible
-   fetch against the OpenKBS proxy (`proxy.openkbs.com/v1/openai`) with
-   hand-rolled tool dispatch — same 3 tools, same JSON schemas.
-4. **Google Calendar:** `googleapis` was also too heavy — replaced with a
-   tiny `node:crypto` RS256 JWT signer that exchanges the service-account
-   JWT for an access token, then hits the freebusy + events REST endpoints
-   directly.
-5. **Model:** `gpt-5.4-mini` via the proxy (instead of `gpt-5.4-nano`).
-6. **No GitHub activity section.** (Left in `ask-ivo-temp/`; not ported.)
-7. **Region:** `eu-central-1`.
-
-## Smoke test
-
-Live-deploy walk-through (see `SMOKE.md`).
-
-## Known blocker
-
-The `GOOGLE_SERVICE_ACCOUNT_KEY` in `.env.local` is corrupted — OpenSSL
-reports `n does not equal p q`, so JWT signing is rejected by Google with
-"Invalid JWT Signature". Generate a fresh key in Google Cloud Console →
-IAM → Service Accounts → Keys, base64 the JSON (`base64 -w0 key.json`),
-replace the value in `.env.local`, and redeploy the availability +
-bookings + chat functions. Everything else is wired and verified.
+MIT — see [LICENSE](./LICENSE).

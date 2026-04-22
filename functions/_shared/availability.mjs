@@ -1,17 +1,25 @@
 /**
- * 7-day availability generator — ported from ask-ivo-temp/src/lib/availability.ts.
+ * 7-day availability generator.
  *
- * Differences from Next.js version:
- *   - DB is Postgres (DATABASE_URL) instead of SQLite
- *   - Connection pool cached across invocations
- *
- * Shape is identical: 7 days of DayAvailability, each with 30-min slots
- * from 09:00 to 21:00 Sofia time. A slot is `free: false` if it overlaps
- * any busy block from Google freebusy OR any pending/approved booking.
+ * Returns 7 days of 30-min slots within owner.workingHours (config.json),
+ * in owner.timezone. A slot is `free: false` if it overlaps any busy block
+ * from Google freebusy OR any pending/approved booking.
  */
 
 import pg from 'pg';
 import { freeBusyQuery } from './google-calendar.mjs';
+import { getConfig } from './config.mjs';
+
+const { owner } = getConfig();
+const TIMEZONE = owner.timezone;
+
+function parseHHMM(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 2 + (m >= 30 ? 1 : 0); // half-hour index from midnight
+}
+
+const HALF_HOUR_START = parseHHMM(owner.workingHours.start);
+const HALF_HOUR_END = parseHHMM(owner.workingHours.end);
 
 let pool;
 function getPool() {
@@ -28,17 +36,17 @@ function getPool() {
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-function sofiaOffsetForDate(dateStr) {
+function tzOffsetForDate(dateStr) {
   const probe = new Date(`${dateStr}T12:00:00Z`);
-  const sofiaHour = parseInt(
+  const localHour = parseInt(
     new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Europe/Sofia',
+      timeZone: TIMEZONE,
       hour: 'numeric',
       hour12: false,
     }).format(probe),
     10,
   );
-  const offset = sofiaHour - 12;
+  const offset = localHour - 12;
   return `${offset >= 0 ? '+' : '-'}${String(Math.abs(offset)).padStart(2, '0')}:00`;
 }
 
@@ -55,7 +63,7 @@ export async function getAvailability() {
   const freeBusy = await freeBusyQuery({
     timeMin: now.toISOString(),
     timeMax: weekLater.toISOString(),
-    timeZone: 'Europe/Sofia',
+    timeZone: TIMEZONE,
     calendarIds,
   });
 
@@ -93,7 +101,7 @@ export async function getAvailability() {
         parts.length === 3 && parts[0].length === 2
           ? `${parts[2]}-${parts[1]}-${parts[0]}`
           : b.date;
-      const offStr = sofiaOffsetForDate(isoDate);
+      const offStr = tzOffsetForDate(isoDate);
       const [h, m] = String(b.start_time).split(':').map(Number);
       const endMin = h * 60 + m + b.duration;
       const endH = Math.floor(endMin / 60);
@@ -111,21 +119,20 @@ export async function getAvailability() {
   for (let d = 0; d < 7; d++) {
     const day = new Date(now);
     day.setDate(day.getDate() + d);
-    const sofiaDate = new Date(
-      day.toLocaleString('en-US', { timeZone: 'Europe/Sofia' }),
+    const localDate = new Date(
+      day.toLocaleString('en-US', { timeZone: TIMEZONE }),
     );
-    const year = sofiaDate.getFullYear();
-    const month = sofiaDate.getMonth();
-    const date = sofiaDate.getDate();
-    const dayOfWeek = DAY_NAMES[sofiaDate.getDay()];
+    const year = localDate.getFullYear();
+    const month = localDate.getMonth();
+    const date = localDate.getDate();
+    const dayOfWeek = DAY_NAMES[localDate.getDay()];
 
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
     const displayDate = `${String(date).padStart(2, '0')}-${String(month + 1).padStart(2, '0')}-${year}`;
-    const offsetStr = sofiaOffsetForDate(dateStr);
+    const offsetStr = tzOffsetForDate(dateStr);
     const slots = [];
 
-    // 09:00 (halfHour=18) through 21:00 (halfHour=42)
-    for (let halfHour = 18; halfHour < 42; halfHour++) {
+    for (let halfHour = HALF_HOUR_START; halfHour < HALF_HOUR_END; halfHour++) {
       const hour = Math.floor(halfHour / 2);
       const min = (halfHour % 2) * 30;
       const nextHalfHour = halfHour + 1;
@@ -146,11 +153,11 @@ export async function getAvailability() {
       const endStr = `${String(nextHour).padStart(2, '0')}:${String(nextMin).padStart(2, '0')}`;
 
       if (d === 0) {
-        const nowSofia = new Date(
-          now.toLocaleString('en-US', { timeZone: 'Europe/Sofia' }),
+        const nowLocal = new Date(
+          now.toLocaleString('en-US', { timeZone: TIMEZONE }),
         );
-        if (hour < nowSofia.getHours() ||
-            (hour === nowSofia.getHours() && min < nowSofia.getMinutes())) continue;
+        if (hour < nowLocal.getHours() ||
+            (hour === nowLocal.getHours() && min < nowLocal.getMinutes())) continue;
       }
 
       slots.push({ start: startStr, end: endStr, free: !isBusy });

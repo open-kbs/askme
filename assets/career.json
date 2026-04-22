@@ -1,0 +1,49 @@
+{
+  "summary": "A 2-4 sentence professional summary — this is how the AI will introduce you. Describe what you do, your years of experience, and the problems you solve.",
+  "experience": [
+    {
+      "company": "Company Name",
+      "role": "Your Role",
+      "period": "January 2022 - Present",
+      "description": "1-2 sentences on what you did there. What kind of company, what kind of work.",
+      "highlights": [
+        "Key achievement or responsibility #1",
+        "Key achievement or responsibility #2"
+      ]
+    },
+    {
+      "company": "Previous Company",
+      "role": "Previous Role",
+      "period": "June 2019 - December 2021",
+      "description": "1-2 sentences on what you did there.",
+      "highlights": []
+    }
+  ],
+  "education": [
+    {
+      "institution": "University Name",
+      "degree": "B.Sc. in Your Field",
+      "period": "2015 - 2019"
+    }
+  ],
+  "skills": [
+    "Skill 1",
+    "Skill 2",
+    "Skill 3",
+    "Skill 4"
+  ],
+  "languages": ["English"],
+  "certifications": [],
+  "sideProjects": [
+    {
+      "name": "Project Name",
+      "role": "Creator",
+      "description": "1-2 sentences on what the project is and what you built.",
+      "techStack": ["Tech 1", "Tech 2"],
+      "github": "https://github.com/your-handle/project",
+      "notableApps": []
+    }
+  ],
+  "earlierVentures": "Any other ventures, communities, or background worth a line — or leave as an empty string.",
+  "conditionalFacts": []
+}

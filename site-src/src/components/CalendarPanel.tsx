@@ -3,6 +3,7 @@ import { SignInButton, SignOutButton } from "./AuthButtons";
 import { useAuthedFetch, useSession } from "../hooks/useSession";
 import { AvailabilityGrid, type DayAvailability, type Slot } from "./AvailabilityGrid";
 import { BookingModal } from "./BookingModal";
+import { config } from "../config";
 
 type Props = {
   onBooked?: () => void;
@@ -63,7 +64,7 @@ export function CalendarPanel({ onBooked }: Props = {}) {
           <h2 className="text-base font-semibold tracking-tight">Availability</h2>
           {status === "authenticated" && <SignOutButton />}
         </div>
-        <p className="text-xs text-foreground/40">Sofia time (EET/EEST)</p>
+        <p className="text-xs text-foreground/40">{config.owner.timezoneLabel}</p>
       </div>
 
       <div className="flex-1 flex flex-col min-h-0">

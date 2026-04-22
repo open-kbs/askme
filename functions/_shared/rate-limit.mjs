@@ -22,23 +22,9 @@
  * window we check).
  */
 
-import pg from 'pg';
+import { getPool } from './db.mjs';
 
-let pool;
 let schemaReady;
-
-function getPool() {
-  if (!pool) {
-    if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not set');
-    pool = new pg.Pool({
-      connectionString: process.env.DATABASE_URL,
-      max: 3,
-      idleTimeoutMillis: 60_000,
-      ssl: { rejectUnauthorized: false },
-    });
-  }
-  return pool;
-}
 
 async function ensureSchema() {
   if (schemaReady) return schemaReady;

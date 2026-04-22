@@ -4,6 +4,9 @@ import { getAvailability } from './_shared/availability.mjs';
 import { createBooking } from './_shared/bookings.mjs';
 import { sendContactMessageEmail } from './_shared/emails.mjs';
 import { checkRateLimit, getClientIp } from './_shared/rate-limit.mjs';
+import { getConfig } from './_shared/config.mjs';
+
+const { owner } = getConfig();
 
 /**
  * Chat handler — raw OpenAI-compatible fetch against the OpenKBS proxy.
@@ -32,8 +35,7 @@ const TOOLS = [
     type: 'function',
     function: {
       name: 'checkAvailability',
-      description:
-        "Check Ivo's real-time calendar availability for the next 7 days. Use this when someone asks about availability, free time, or wants to book a meeting. Returns available time slots in Sofia time (EET/EEST).",
+      description: `Check ${owner.firstName}'s real-time calendar availability for the next 7 days. Use this when someone asks about availability, free time, or wants to book a meeting. Returns available time slots in ${owner.timezoneLabel}.`,
       parameters: { type: 'object', properties: {}, additionalProperties: false },
     },
   },
@@ -41,15 +43,14 @@ const TOOLS = [
     type: 'function',
     function: {
       name: 'createBooking',
-      description:
-        "Create a booking request for a call with Ivo. The booking goes to Ivo for approval — the visitor will receive an email confirmation once approved. Collect the visitor's name, email, preferred date, time, and optionally a topic before calling this tool.",
+      description: `Create a booking request for a call with ${owner.firstName}. The booking goes to ${owner.firstName} for approval — the visitor will receive an email confirmation once approved. Collect the visitor's name, email, preferred date, time, and optionally a topic before calling this tool.`,
       parameters: {
         type: 'object',
         properties: {
           name: { type: 'string', description: "The visitor's full name" },
           email: { type: 'string', description: "The visitor's email address" },
           date: { type: 'string', description: 'The booking date in dd-mm-yyyy format' },
-          startTime: { type: 'string', description: 'The start time in HH:MM format (24h, Sofia time)' },
+          startTime: { type: 'string', description: `The start time in HH:MM format (24h, ${owner.timezoneLabel})` },
           duration: { type: 'integer', enum: [30, 60], description: 'Call duration in minutes — 30 or 60' },
           topic: { type: 'string', description: 'What the visitor wants to discuss' },
         },
@@ -62,14 +63,13 @@ const TOOLS = [
     type: 'function',
     function: {
       name: 'sendMessage',
-      description:
-        "Send a message/email to Ivo on behalf of the visitor. Use this when someone wants to contact Ivo, send him a message, or reach out. Collect the visitor's name, email, and message before calling this tool.",
+      description: `Send a message/email to ${owner.firstName} on behalf of the visitor. Use this when someone wants to contact ${owner.firstName}, send a message, or reach out. Collect the visitor's name, email, and message before calling this tool.`,
       parameters: {
         type: 'object',
         properties: {
           name: { type: 'string', description: "The visitor's full name" },
           email: { type: 'string', description: "The visitor's email address" },
-          message: { type: 'string', description: 'The message content to send to Ivo' },
+          message: { type: 'string', description: `The message content to send to ${owner.firstName}` },
         },
         required: ['name', 'email', 'message'],
         additionalProperties: false,
@@ -96,7 +96,7 @@ async function runTool(name, args) {
     if (name === 'sendMessage') {
       const { name: n, email, message } = args;
       await sendContactMessageEmail({ name: n, email, message });
-      return { success: true, message: 'Message sent! Ivo will get back to you.' };
+      return { success: true, message: `Message sent! ${owner.firstName} will get back to you.` };
     }
     return { error: `unknown tool: ${name}` };
   } catch (err) {

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { config } from "../config";
 
 export function ContactForm() {
   const [name, setName] = useState("");
@@ -93,7 +94,7 @@ export function ContactForm() {
 
       {status === "sent" && (
         <p className="text-sm text-green-600 dark:text-green-400">
-          Message sent! Ivo will get back to you.
+          Message sent! {config.owner.firstName} will get back to you.
         </p>
       )}
 

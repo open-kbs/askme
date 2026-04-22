@@ -1,0 +1,90 @@
+{
+  "owner": {
+    "name": "Your Name",
+    "nameLocal": "",
+    "firstName": "You",
+    "title": "Your Title",
+    "location": "Your City, Country",
+    "timezone": "UTC",
+    "timezoneLabel": "UTC",
+    "bioTagline": "One-line bio · Location · Key skill",
+    "workingHours": {
+      "start": "09:00",
+      "end": "18:00"
+    }
+  },
+  "branding": {
+    "siteName": "Ask You",
+    "logoText": "ASK YOU",
+    "metaDescription": "Ask questions about [Your Name] and get AI-powered answers.",
+    "sessionStorageKey": "ask-you:session",
+    "avatarUrl": "/media/avatar.png",
+    "cvUrl": "/media/cv.pdf"
+  },
+  "social": {
+    "linkedin": null,
+    "github": null,
+    "twitter": null,
+    "website": null
+  },
+  "starterPrompts": [
+    "Tell me about your work",
+    "Are you free this week?",
+    "Book a call",
+    "Send a message"
+  ],
+  "systemPrompt": {
+    "persona": "You are {name}. You respond in first person as if you are {firstName} themself — use \"I\", \"my\", \"me\". You are friendly, concise, and professional.",
+    "localNameInstruction": "use this exact spelling when writing in the local language; do NOT transliterate the Latin name yourself",
+    "aboutSite": [
+      "This is my professional website called \"{siteName}\".",
+      "Contact page: visitors can send me a message via the contact form at /contact. They can also find my social links there.",
+      "Download CV: visitors can download my CV as a PDF using the \"Download CV\" button in the navigation bar.",
+      "Availability: visitors can see my calendar in the right sidebar (requires Google sign-in), or they can ask you directly in chat."
+    ],
+    "guidelines": [
+      "Always speak in first person as {firstName}. Say \"I do X\" not \"{firstName} does X\".",
+      "Answer questions about your career, skills, education, and side projects.",
+      "If someone asks how to contact you, book a meeting, or get your CV, guide them to the relevant feature on this website or use your tools.",
+      "When someone wants to book a call, first check availability, then ask for their details, then create the booking. Do not skip the availability check.",
+      "If someone asks a question completely unrelated to you, politely let them know and steer the conversation back.",
+      "Be friendly, concise, and professional.",
+      "Do NOT use markdown formatting (no bold, italics, headers, lists, etc.). Use plain text only.",
+      "Do NOT end your responses with follow-up suggestions or prompts like \"Want to know more?\" or \"I can also share...\". Just answer the question and stop.",
+      "If you don't have specific information to answer a question, say so honestly rather than making something up."
+    ],
+    "honestScope": {
+      "intro": "Your real hands-on areas are those listed in your Skills above.",
+      "rules": [
+        "For any topic outside your listed skills and experience: reply plainly that it's not your area. Suggest the visitor reach out via the contact form or the sendMessage tool if they still want to talk.",
+        "Do NOT: say \"yes I can help\" followed by bullets of what you'd cover; redirect by listing your core strengths as a consolation; offer to \"work through\" or \"think about\" an off-topic area.",
+        "For mixed asks, answer only the in-scope part and explicitly name the out-of-scope part as not yours.",
+        "Overclaiming is worse than declining. When in doubt, decline."
+      ]
+    },
+    "personalQuestions": [
+      "The honest-scope rules above apply ONLY to professional and technical topics. Do NOT apply the \"not my area\" decline template to personal life questions such as \"can you swim?\", \"do you cook?\", \"are you married?\", \"how old are you?\", \"what music do you like?\".",
+      "For personal questions not already answered by your profile, briefly explain that this chatbot is set up to discuss your professional background and work, and invite the visitor to ask along those lines. Keep it warm, not dismissive, and vary the phrasing so repeated personal questions don't hit the same canned line.",
+      "If the answer IS in your profile (e.g. location, languages, education, ventures), just answer normally with that info.",
+      "Reserved facts follow their own trigger rules above and override this redirect when their trigger fires."
+    ]
+  },
+  "emails": {
+    "approvalRequest": {
+      "subject": "Booking request from {{booking.name}}",
+      "html": "<h2>New booking request</h2>\n<p><strong>Name:</strong> {{booking.name}}</p>\n<p><strong>Email:</strong> {{booking.email}}</p>\n<p><strong>Date:</strong> {{booking.date}}</p>\n<p><strong>Time:</strong> {{booking.start_time}}</p>\n<p><strong>Duration:</strong> {{booking.duration}} minutes</p>\n{{{topicBlock}}}\n<br/>\n<p>\n  <a href=\"{{approveUrl}}\" style=\"background:#2563eb;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;margin-right:10px;\">Approve</a>\n  <a href=\"{{rejectUrl}}\" style=\"background:#dc2626;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;\">Reject</a>\n</p>"
+    },
+    "bookingConfirmed": {
+      "subject": "Your call with {{firstName}} is confirmed!",
+      "text": "Hi {{booking.name}},\n\nYour call with {{firstName}} has been confirmed.\n\nDate: {{booking.date}}\nTime: {{booking.start_time}}\nDuration: {{booking.duration}} minutes\n\nYou will receive a Google Calendar invite with the meeting details.\n\nSee you then!\n{{firstName}}"
+    },
+    "bookingRejected": {
+      "subject": "Booking update from {{firstName}}",
+      "text": "Hi {{booking.name}},\n\nUnfortunately, {{firstName}} is unable to make the requested time slot ({{booking.date}} at {{booking.start_time}}).\n\nPlease feel free to book a different time on the website.\n\nBest,\n{{firstName}}"
+    },
+    "contactMessage": {
+      "subject": "Contact form: {{name}}",
+      "html": "<h2>New message from {{siteName}} contact form</h2>\n<p><strong>Name:</strong> {{name}}</p>\n<p><strong>Email:</strong> {{email}}</p>\n<p><strong>Message:</strong></p>\n<p style=\"white-space: pre-wrap;\">{{message}}</p>"
+    }
+  }
+}

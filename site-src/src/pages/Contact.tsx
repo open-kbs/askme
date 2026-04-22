@@ -1,4 +1,5 @@
 import { ContactForm } from "../components/ContactForm";
+import { config } from "../config";
 
 export default function Contact() {
   return (
@@ -11,22 +12,26 @@ export default function Contact() {
       <ContactForm />
 
       <div className="mt-8 pt-6 border-t border-foreground/10 flex flex-row flex-wrap gap-3 md:gap-4">
-        <a
-          href="https://www.linkedin.com/in/ivo-stoynovski-b159b8182/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-accent hover:opacity-80 transition-opacity"
-        >
-          LinkedIn
-        </a>
-        <a
-          href="https://github.com/ivostoynovski"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-accent hover:opacity-80 transition-opacity"
-        >
-          GitHub
-        </a>
+        {config.social.linkedin && (
+          <a
+            href={config.social.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-accent hover:opacity-80 transition-opacity"
+          >
+            LinkedIn
+          </a>
+        )}
+        {config.social.github && (
+          <a
+            href={config.social.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-accent hover:opacity-80 transition-opacity"
+          >
+            GitHub
+          </a>
+        )}
       </div>
     </div>
   );

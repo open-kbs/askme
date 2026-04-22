@@ -16,7 +16,10 @@
     "skipLibCheck": true,
     "noEmit": true,
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "paths": {
+      "@/*": ["src/*"],
+      "@config": ["../config.json"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "../config.json"]
 }
