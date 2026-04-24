@@ -3,15 +3,35 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "node:path";
 
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
+import type { Plugin } from "vite";
 
 const configJsonPath = path.resolve(__dirname, "../config.json");
 const rootConfig = JSON.parse(readFileSync(configJsonPath, "utf-8"));
+
+const assetsDir = path.resolve(__dirname, "../assets");
+
+function serveMedia(): Plugin {
+  return {
+    name: "serve-media",
+    configureServer(server) {
+      server.middlewares.use((req, _res, next) => {
+        if (!req.url?.startsWith("/media/")) return next();
+        const file = req.url.slice("/media/".length);
+        const abs = path.join(assetsDir, file);
+        if (!abs.startsWith(assetsDir) || !existsSync(abs)) return next();
+        req.url = "/@fs/" + abs;
+        next();
+      });
+    },
+  };
+}
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    serveMedia(),
     {
       name: "html-config-substitute",
       transformIndexHtml(html) {

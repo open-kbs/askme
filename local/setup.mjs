@@ -163,7 +163,7 @@ export function registerSetupRoutes(app, { repoRoot }) {
     return c.json({ ok: true });
   });
 
-  // Test — LLM key auth. Sends a 1-token chat completion to verify the key.
+  // Test — LLM key auth. Sends a minimal chat completion to verify the key.
   // Accepts either an OpenAI key or an OpenKBS proxy key. The `provider`
   // field selects the endpoint: "openai" → api.openai.com, default → proxy.
   setup.post('/test/llm', async (c) => {
@@ -180,9 +180,9 @@ export function registerSetupRoutes(app, { repoRoot }) {
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: 'gpt-5.4-mini',
-          messages: [{ role: 'user', content: 'hi' }],
-          max_completion_tokens: 1,
+          model: 'gpt-4.1-nano',
+          messages: [{ role: 'user', content: 'say ok' }],
+          max_completion_tokens: 16,
         }),
       });
       if (!res.ok) {
