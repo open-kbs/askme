@@ -17,7 +17,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { randomBytes } from 'node:crypto';
 
-const REQUIRED_ENV = [
+// Only an LLM key is required to get chat working. Everything else is
+// optional — calendar, bookings, and email features activate when their
+// keys are added later.
+const LLM_KEY_NAMES = ['OPENAI_API_KEY', 'OPENKBS_API_KEY'];
+
+const OPTIONAL_ENV = [
   'GOOGLE_OAUTH_CLIENT_ID',
   'GOOGLE_SERVICE_ACCOUNT_KEY',
   'GOOGLE_CALENDAR_IDS',
@@ -25,7 +30,6 @@ const REQUIRED_ENV = [
   'APP_URL',
   'CONTACT_EMAIL',
   'FROM_EMAIL',
-  'OPENKBS_API_KEY',
 ];
 
 // Fields whose default value in the committed `config.json` means "not yet
@@ -94,14 +98,21 @@ export function registerSetupRoutes(app, { repoRoot }) {
 
     const envPath = path.join(repoRoot, '.env.local');
     const hasEnvLocal = fs.existsSync(envPath);
-    let missingEnv = [...REQUIRED_ENV];
-    if (hasEnvLocal) {
-      const env = parseDotenv(fs.readFileSync(envPath, 'utf8'));
-      missingEnv = REQUIRED_ENV.filter((k) => !env[k]);
-    }
+    const env = hasEnvLocal
+      ? parseDotenv(fs.readFileSync(envPath, 'utf8'))
+      : {};
+    const hasLLMKey = LLM_KEY_NAMES.some((k) => Boolean(env[k]));
+    const missingOptional = OPTIONAL_ENV.filter((k) => !env[k]);
 
-    const configured = missingConfig.length === 0 && missingEnv.length === 0;
-    return c.json({ configured, missingConfig, missingEnv, hasEnvLocal });
+    // "configured" means chat works: owner identity filled + LLM key set.
+    const configured = missingConfig.length === 0 && hasLLMKey;
+    return c.json({
+      configured,
+      missingConfig,
+      hasLLMKey,
+      missingOptional,
+      hasEnvLocal,
+    });
   });
 
   // Current values — pre-fill the wizard form (secrets redacted).
@@ -152,28 +163,28 @@ export function registerSetupRoutes(app, { repoRoot }) {
     return c.json({ ok: true });
   });
 
-  // Test — OpenKBS LLM proxy auth. `/v1/models` is public (doesn't validate
-  // the key), so we send a 1-token chat completion instead. Costs a few
-  // credits but actually proves the key works.
+  // Test — LLM key auth. Sends a 1-token chat completion to verify the key.
+  // Accepts either an OpenAI key or an OpenKBS proxy key. The `provider`
+  // field selects the endpoint: "openai" → api.openai.com, default → proxy.
   setup.post('/test/llm', async (c) => {
-    const { apiKey } = await c.req.json().catch(() => ({}));
+    const { apiKey, provider } = await c.req.json().catch(() => ({}));
     if (!apiKey) return c.json({ ok: false, error: 'apiKey required' }, 400);
+    const baseURL = provider === 'openai'
+      ? 'https://api.openai.com/v1/chat/completions'
+      : 'https://proxy.openkbs.com/v1/openai/chat/completions';
     try {
-      const res = await fetch(
-        'https://proxy.openkbs.com/v1/openai/chat/completions',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            model: 'gpt-5.4-mini',
-            messages: [{ role: 'user', content: 'hi' }],
-            max_completion_tokens: 1,
-          }),
+      const res = await fetch(baseURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
         },
-      );
+        body: JSON.stringify({
+          model: 'gpt-5.4-mini',
+          messages: [{ role: 'user', content: 'hi' }],
+          max_completion_tokens: 1,
+        }),
+      });
       if (!res.ok) {
         const text = await res.text();
         return c.json({ ok: false, error: `HTTP ${res.status}: ${text.slice(0, 200)}` });

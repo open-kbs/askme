@@ -44,6 +44,10 @@ export async function handler(event) {
     return json({ success: true });
   }
 
+  if (!process.env.CONTACT_EMAIL) {
+    return json({ error: 'Contact form not configured — add CONTACT_EMAIL to enable' }, 501);
+  }
+
   if (!name || !email || !message) {
     return json({ error: 'All fields are required' }, 400);
   }

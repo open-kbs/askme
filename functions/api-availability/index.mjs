@@ -23,6 +23,10 @@ export async function handler(event) {
   const user = await getUserFromEvent(event);
   if (!user) return json({ error: 'Unauthorized — please sign in' }, 401);
 
+  if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY || !process.env.GOOGLE_CALENDAR_IDS) {
+    return json({ error: 'Calendar not configured — add Google credentials to enable availability' }, 501);
+  }
+
   try {
     const days = await getAvailability();
     return json({ days }, 200, { 'Cache-Control': 'no-store' });

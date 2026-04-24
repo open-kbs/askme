@@ -205,16 +205,18 @@ async function approveBooking(booking) {
         ? `${parts[2]}-${parts[1]}-${parts[0]}`
         : booking.date;
 
-    await createEvent({
-      summary: `Call with ${booking.name}`,
-      description: `Booked via ${branding.siteName}\n\nName: ${booking.name}\nEmail: ${booking.email}${booking.topic ? `\nTopic: ${booking.topic}` : ''}`,
-      startDateTime: `${isoDate}T${booking.start_time}:00`,
-      endDateTime: `${isoDate}T${endTime}:00`,
-      attendeeEmail: booking.email,
-    });
+    if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY && process.env.GOOGLE_CALENDAR_WRITE_ID) {
+      await createEvent({
+        summary: `Call with ${booking.name}`,
+        description: `Booked via ${branding.siteName}\n\nName: ${booking.name}\nEmail: ${booking.email}${booking.topic ? `\nTopic: ${booking.topic}` : ''}`,
+        startDateTime: `${isoDate}T${booking.start_time}:00`,
+        endDateTime: `${isoDate}T${endTime}:00`,
+        attendeeEmail: booking.email,
+      });
+    }
 
     await setStatus(booking.id, 'approved');
-    await sendBookingConfirmedEmail(booking);
+    try { await sendBookingConfirmedEmail(booking); } catch (e) { console.error('confirmation email failed:', e); }
 
     return html(
       page({
@@ -242,7 +244,7 @@ async function approveBooking(booking) {
 async function rejectBooking(booking) {
   try {
     await setStatus(booking.id, 'rejected');
-    await sendBookingRejectedEmail(booking);
+    try { await sendBookingRejectedEmail(booking); } catch (e) { console.error('rejection email failed:', e); }
     return html(
       page({
         title: 'Booking Rejected',

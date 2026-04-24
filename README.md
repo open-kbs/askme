@@ -30,16 +30,13 @@ and pass along contact messages. Clone it, personalize it, run it locally.
 ## Prerequisites
 
 - **Node.js 20+** and **npm**.
-- **Google Cloud project** with:
-  - OAuth 2.0 Client ID (web) — for visitor sign-in
-  - Service account + JSON key — for Calendar read access
-  - Calendar API enabled
-- **OpenKBS API key** — for the LLM proxy. Get one at
-  [openkbs.com](https://openkbs.com).
+- **LLM key** — either an [OpenAI API key](https://platform.openai.com/api-keys)
+  (direct) or an [OpenKBS API key](https://openkbs.com) (proxy that covers
+  OpenAI + Anthropic + Google under one key).
 
-The local dev server exposes setup API endpoints that validate each of
-these credentials. Your coding agent calls them automatically during
-setup; you can also test manually with `curl`.
+That's enough to get chat working. Calendar, bookings, and contact form
+are **optional** — they activate when you add Google and email credentials
+later. See [AGENTS.md](./AGENTS.md) step 8 for details.
 
 ## Quickstart
 
@@ -55,10 +52,10 @@ npm run dev
 # Open the repo in your coding agent and say: "set up this project"
 ```
 
-The agent follows [`AGENTS.md`](./AGENTS.md): parses your PDF, writes
-`assets/career.json`, fills `config.json`, then saves credentials to
-`.env.local` and validates them via the setup API — all without leaving
-the terminal.
+The agent follows [`SETUP.md`](./SETUP.md): parses your PDF, writes
+`assets/career.json`, fills `config.json`, then saves your LLM key to
+`.env.local` and validates it via the setup API — all without leaving
+the terminal. Calendar and email credentials are optional (step 7).
 
 ### Alternative — manual
 
@@ -131,7 +128,8 @@ functions/               Lambda handlers (run locally in-process)
   api-cleanup/           Cron: prune stale rate-limits + expired bookings
 site-src/                React + Vite + Tailwind source
 local/                   Dev harness (server, PGlite shim, setup API)
-AGENTS.md                Agent-runnable personalization + dev guide
+SETUP.md                 First-time setup guide (agents read this once)
+AGENTS.md                Ongoing dev guide (agents read this always)
 CLAUDE.md                One-line pointer → AGENTS.md
 ```
 

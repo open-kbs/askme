@@ -119,12 +119,28 @@ function toOpenAIMessages(input) {
     .filter((m) => m.content.length > 0);
 }
 
+function getLLMConfig() {
+  if (process.env.OPENAI_API_KEY) {
+    return {
+      baseURL: 'https://api.openai.com/v1/chat/completions',
+      apiKey: process.env.OPENAI_API_KEY,
+    };
+  }
+  if (process.env.OPENKBS_API_KEY) {
+    return {
+      baseURL: 'https://proxy.openkbs.com/v1/openai/chat/completions',
+      apiKey: process.env.OPENKBS_API_KEY,
+    };
+  }
+  return null;
+}
+
 async function callModel(messages) {
-  const apiKey = process.env.OPENKBS_API_KEY;
-  if (!apiKey) throw new Error('OPENKBS_API_KEY not set');
-  const res = await fetch('https://proxy.openkbs.com/v1/openai/chat/completions', {
+  const llm = getLLMConfig();
+  if (!llm) throw new Error('No LLM key — set OPENAI_API_KEY or OPENKBS_API_KEY');
+  const res = await fetch(llm.baseURL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${llm.apiKey}` },
     body: JSON.stringify({
       model: 'gpt-5.4-mini',
       messages,
@@ -133,7 +149,7 @@ async function callModel(messages) {
     }),
   });
   const text = await res.text();
-  if (!res.ok) throw new Error(`proxy ${res.status}: ${text}`);
+  if (!res.ok) throw new Error(`LLM ${res.status}: ${text}`);
   return JSON.parse(text);
 }
 
