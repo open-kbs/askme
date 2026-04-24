@@ -1,5 +1,9 @@
 /**
- * Setup wizard backend — registers `/api/setup/*` routes on the dev Hono app.
+ * Setup API backend — registers `/api/setup/*` routes on the dev Hono app.
+ *
+ * Called by the coding agent (or manually via curl) during first-time setup
+ * to save config, write .env.local, and test credentials. There is no
+ * browser-based setup UI — see AGENTS.md for the setup flow.
  *
  * All routes are gated to the loopback interface. The server also binds to
  * 127.0.0.1 only, so these endpoints are never reachable from the network.
