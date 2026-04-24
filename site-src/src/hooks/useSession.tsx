@@ -10,7 +10,7 @@ import {
 } from "react";
 import { config } from "../config";
 
-type Status = "loading" | "authenticated" | "unauthenticated";
+type Status = "loading" | "authenticated" | "unauthenticated" | "no_client_id";
 
 export type SessionUser = {
   sub: string;
@@ -180,7 +180,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [initialized],
   );
 
-  const status: Status = !initialized ? "loading" : data ? "authenticated" : "unauthenticated";
+  const status: Status = !clientId ? "no_client_id" : !initialized ? "loading" : data ? "authenticated" : "unauthenticated";
 
   const value = useMemo<SessionContextValue>(
     () => ({ status, data, signOut, renderGisButton }),
