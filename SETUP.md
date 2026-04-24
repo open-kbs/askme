@@ -125,10 +125,17 @@ credential one at a time:
 Save it as `GOOGLE_OAUTH_CLIENT_ID`.
 
 **4b.** Ask:
-> Paste your Google service account JSON key (or the file path). I'll
-> base64-encode it.
+> I need your Google service account JSON key. Two options:
+>
+> **A) Drop the JSON file in the repo root** (e.g. `service-account.json`)
+> and tell me the filename — I'll read and base64-encode it. The key
+> stays out of the chat logs.
+>
+> **B) Paste the JSON here** — I'll base64-encode it, but it will appear
+> in this conversation's logs.
 
-If they paste raw JSON, base64-encode it. Save as `GOOGLE_SERVICE_ACCOUNT_KEY`.
+If they give a file path, read it. If they paste raw JSON, use it directly.
+Either way, base64-encode the JSON and save as `GOOGLE_SERVICE_ACCOUNT_KEY`.
 
 **4c.** Ask:
 > Which calendar(s) should I read for availability? (comma-separated email
