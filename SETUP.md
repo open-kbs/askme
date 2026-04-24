@@ -39,11 +39,14 @@ Then:
    - `starterPrompts` — 4 prompts tuned to their field (include one booking
      + one message prompt)
 4. If the user provided an avatar, copy to `assets/avatar.png`.
-   If not, tell them they can add one later.
 
-Show the diff and ask: **"Does this look right?"**
+Show the diff and ask: **"Does this look right? Also, do you have an
+avatar image you'd like to use? (drop it in the repo root or skip for
+now)"**
 
-Do not proceed until the user confirms.
+If they provide one, copy to `assets/avatar.png`. If they skip, move on.
+
+Do not proceed until the user confirms the profile data.
 
 ---
 
@@ -51,20 +54,32 @@ Do not proceed until the user confirms.
 
 Ask:
 
-> Paste your OpenAI API key (starts with `sk-`) or OpenKBS API key so I
-> can connect the chat.
+> The chat needs an LLM key. You have two options:
+>
+> **A) Paste it here** — I'll save and test it automatically. Note: the
+> key will appear in this conversation's logs.
+>
+> **B) Add it yourself** — open `.env.local` and add
+> `OPENAI_API_KEY=sk-...` or `OPENKBS_API_KEY=...`, then tell me when
+> it's done.
+>
+> Which do you prefer?
 
-Wait for the key. Then:
+Wait for the user to choose.
+
+**If option A (paste):**
 
 1. Detect the type: starts with `sk-` → `OPENAI_API_KEY`, otherwise →
    `OPENKBS_API_KEY`.
-2. Make sure `npm run dev` is running. If not, start it.
-3. Save:
+2. Save via the setup API (the user must have `npm run dev` running):
    ```bash
    curl -s -X POST http://127.0.0.1:8787/api/setup/save \
      -H 'Content-Type: application/json' \
      -d '{ "env": { "<KEY_NAME>": "<value>" } }'
    ```
+3. If the save fails because the server isn't running, tell the user:
+   **"Run `npm run dev` in a separate terminal, then tell me when it's
+   ready."**
 4. Test:
    ```bash
    curl -s -X POST http://127.0.0.1:8787/api/setup/test/llm \
@@ -73,7 +88,16 @@ Wait for the key. Then:
    ```
    Omit `"provider"` for OpenKBS keys.
 5. If test fails, show the error and ask the user to check the key.
-6. If test passes, tell the user to restart `npm run dev`.
+
+**If option B (manual):**
+
+1. Wait for the user to confirm they've added the key to `.env.local`.
+2. If the server isn't running, tell the user to start it (`npm run dev`).
+3. Read the key from `.env.local` and test it using the curl command above.
+4. If test fails, show the error. If it passes, continue.
+
+**Do not start `npm run dev` yourself.** Always ask the user to run it
+in a separate terminal.
 
 ---
 
@@ -151,7 +175,8 @@ If the test fails, show the error and help debug. Common issues:
 - Service account not shared on the calendar
 - Wrong calendar ID
 
-**4h.** Tell the user to restart `npm run dev`. Done.
+**4h.** Tell the user: **"Restart `npm run dev` to pick up the new
+credentials."** Done.
 
 ---
 
@@ -163,3 +188,5 @@ If the test fails, show the error and help debug. Common issues:
 - Never write `.env.local` by hand — always use `/api/setup/save`.
 - Don't rewrite `config.json.systemPrompt` unless the user asks.
   The defaults are carefully tuned.
+- Don't start `npm run dev` yourself. Ask the user to run it in a
+  separate terminal.
