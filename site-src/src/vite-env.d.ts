@@ -1,3 +1,9 @@
 /// <reference types="vite/client" />
 
-declare const __GOOGLE_CLIENT_ID__: string;
+interface ImportMetaEnv {
+  readonly GOOGLE_OAUTH_CLIENT_ID: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
