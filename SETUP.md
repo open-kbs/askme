@@ -217,6 +217,19 @@ credentials."** Done.
 
 ---
 
+## After setup — what works locally
+
+Tell the user:
+
+> **What works locally:** Chat with the AI, calendar UI, contact form
+> submission.
+>
+> **What needs deployment:** Google Sign-In, email notifications
+> (booking confirmations, contact messages), and calendar event
+> creation require OpenKBS cloud infrastructure.
+
+---
+
 ## Rules for the agent
 
 - Show which step you're on (e.g. "**Step 2 of 5 — LLM key**") when
