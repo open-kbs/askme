@@ -72,7 +72,7 @@ export async function checkRateLimit({ key, endpoint, limits }) {
     await ensureSchema();
   } catch (err) {
     console.error('rate_limit schema init failed:', err);
-    return { ok: true };
+    return { ok: false };
   }
 
   const db = getPool();
