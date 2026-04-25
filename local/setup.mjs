@@ -158,9 +158,6 @@ export function registerSetupRoutes(app, { repoRoot }) {
     if (!env.BOOKING_SECRET) {
       env.BOOKING_SECRET = randomBytes(32).toString('hex');
     }
-    if (env.GOOGLE_OAUTH_CLIENT_ID) {
-      env.VITE_GOOGLE_CLIENT_ID = env.GOOGLE_OAUTH_CLIENT_ID;
-    }
     fs.writeFileSync(envPath, serializeDotenv(env));
 
     return c.json({ ok: true });

@@ -9,6 +9,18 @@ import type { Plugin } from "vite";
 const configJsonPath = path.resolve(__dirname, "../config.json");
 const rootConfig = JSON.parse(readFileSync(configJsonPath, "utf-8"));
 
+const envLocalPath = path.resolve(__dirname, "../.env.local");
+function readEnvLocal(): Record<string, string> {
+  if (!existsSync(envLocalPath)) return {};
+  const out: Record<string, string> = {};
+  for (const line of readFileSync(envLocalPath, "utf-8").split("\n")) {
+    const m = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*)/);
+    if (m) out[m[1]] = m[2];
+  }
+  return out;
+}
+const envLocal = readEnvLocal();
+
 const assetsDir = path.resolve(__dirname, "../assets");
 
 function serveMedia(): Plugin {
@@ -61,6 +73,9 @@ export default defineConfig({
       "/api-contact": { target: "http://127.0.0.1:8787", changeOrigin: false },
       "/api/setup": { target: "http://127.0.0.1:8787", changeOrigin: false },
     },
+  },
+  define: {
+    __GOOGLE_CLIENT_ID__: JSON.stringify(envLocal.GOOGLE_OAUTH_CLIENT_ID || ""),
   },
   build: {
     outDir: path.resolve(__dirname, "../site"),

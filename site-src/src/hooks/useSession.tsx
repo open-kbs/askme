@@ -102,7 +102,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     return restored;
   });
 
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
+  const clientId = (typeof __GOOGLE_CLIENT_ID__ !== "undefined" && __GOOGLE_CLIENT_ID__) || undefined;
 
   const handleCredential = useCallback((response: { credential: string }) => {
     const next = sessionFromIdToken(response.credential);
