@@ -56,6 +56,29 @@ local/
 - **A tool in chat** — tools are defined inside `functions/api-chat/index.mjs`
   with the OpenKBS proxy's OpenAI-compatible tool-call format.
 
+## Deploying to OpenKBS
+
+Install the CLI (one-time):
+```bash
+curl -fsSL https://openkbs.com/install.sh | bash
+```
+
+Then authenticate:
+```bash
+openkbs login
+```
+
+Deploy steps:
+1. `npm run build` — build the frontend
+2. `openkbs deploy` — provision elastic services (Postgres, Storage)
+3. `openkbs site deploy` — deploy the static site
+4. `openkbs fn deploy <name>` — deploy each function (`api-chat`,
+   `api-availability`, `api-bookings`, `api-contact`, `api-cleanup`)
+
+No LLM key is needed — OpenKBS injects `OPENKBS_API_KEY` automatically
+into deployed functions, which routes through the AI proxy at
+`https://proxy.openkbs.com`.
+
 ## Things not to do
 
 - Don't commit `.env.local`, `local/.pgdata/`, or `node_modules/`.

@@ -19,7 +19,7 @@ Ask:
 >
 > **B) Deploy to OpenKBS** — I'll collect everything needed for
 > production (Google Calendar, email). No LLM key needed — OpenKBS
-> provides one with bonus credits. Deployment pipeline coming soon.
+> provides one with bonus credits.
 
 Wait for the user to choose, then show the steps for their path:
 
@@ -27,7 +27,7 @@ Wait for the user to choose, then show the steps for their path:
 > 1. Career data  2. Avatar & links  3. LLM key  4. Done
 
 **Path B (deploy):**
-> 1. Career data  2. Avatar & links  3. Google Calendar & email  4. Done
+> 1. Career data  2. Avatar & links  3. Google Calendar & email  4. Deploy  5. Done
 
 After setup, this file is no longer needed — see
 [AGENTS.md](./AGENTS.md) for ongoing development guidance.
@@ -226,11 +226,48 @@ If the test fails, show the error and help debug. Common issues:
 - Service account not shared on the calendar
 - Wrong calendar ID
 
-**3B-h.** Tell the user:
+**3B-h.** Deploy to OpenKBS.
 
-> **Your site is ready for deployment! All credentials are saved.
-> The deploy pipeline is coming soon — when it lands, it'll be a single
-> command to go live.**
+Tell the user:
+
+> **Credentials are saved. Let's deploy your site.**
+
+Run each step and report the result before moving on:
+
+1. Install the OpenKBS CLI (if `openkbs` isn't on PATH):
+   ```bash
+   curl -fsSL https://openkbs.com/install.sh | bash
+   ```
+2. Authenticate:
+   ```bash
+   openkbs login
+   ```
+3. Build the frontend:
+   ```bash
+   npm run build
+   ```
+4. Deploy elastic services (Postgres, Storage):
+   ```bash
+   openkbs deploy
+   ```
+5. Deploy the static site:
+   ```bash
+   openkbs site deploy
+   ```
+6. Deploy each function:
+   ```bash
+   openkbs fn deploy api-chat
+   openkbs fn deploy api-availability
+   openkbs fn deploy api-bookings
+   openkbs fn deploy api-contact
+   openkbs fn deploy api-cleanup
+   ```
+
+If any step fails, show the error and help debug before continuing.
+
+After all deploys succeed, tell the user:
+
+> **Your site is live! All functions and the frontend are deployed.**
 
 Done — setup complete for path B.
 
@@ -238,8 +275,9 @@ Done — setup complete for path B.
 
 ## Rules for the agent
 
-- Show which step you're on (e.g. "**Step 2 of 4 — Career data**") when
-  moving to the next step.
+- Show which step you're on (e.g. "**Step 2 of 4 — Career data**" for
+  path A, or "**Step 2 of 5 — Career data**" for path B) when moving to
+  the next step.
 - Ask one question at a time. Wait for the answer before moving on.
 - Never invent data — only use what the user provides.
 - Never commit. Show diffs and let the user review.
