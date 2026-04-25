@@ -5,23 +5,36 @@ multiple questions into a single prompt.
 
 Before starting, run `npm install` if `node_modules/` doesn't exist.
 
-Then show the user the full plan:
+---
 
-> **Setup steps:**
-> 1. Career data — fill in your profile from a LinkedIn PDF or bio
-> 2. Avatar & social links
-> 3. LLM key — connect the chat
-> 4. Verify — confirm everything works
-> 5. Google Calendar & email (optional)
+## Step 1 — Choose your path
+
+Ask:
+
+> **How do you want to run your site?**
 >
-> Let's start with step 1.
+> **A) Local only** — run on your machine with your own OpenAI key.
+> Chat works immediately. Calendar, sign-in, and email require
+> deployment later.
+>
+> **B) Deploy to OpenKBS** — I'll collect everything needed for
+> production (Google Calendar, email). No LLM key needed — OpenKBS
+> provides one with bonus credits. Deployment pipeline coming soon.
+
+Wait for the user to choose, then show the steps for their path:
+
+**Path A (local):**
+> 1. Career data  2. Avatar & links  3. LLM key  4. Done
+
+**Path B (deploy):**
+> 1. Career data  2. Avatar & links  3. Google Calendar & email  4. Done
 
 After setup, this file is no longer needed — see
 [AGENTS.md](./AGENTS.md) for ongoing development guidance.
 
 ---
 
-## Step 1 — Career data
+## Step 2 — Career data
 
 Ask:
 
@@ -70,7 +83,9 @@ Do not proceed until the user confirms the profile data.
 
 ---
 
-## Step 2 — LLM key
+## Step 3A — LLM key (local path only)
+
+Skip this step if the user chose path B.
 
 Ask:
 
@@ -119,27 +134,24 @@ Wait for the user to choose.
 **Do not start `npm run dev` yourself.** Always ask the user to run it
 in a separate terminal.
 
----
+After the key is verified, tell the user:
 
-## Step 3 — Verify
+> **Chat is working! Calendar, sign-in, and email notifications require
+> deployment to OpenKBS — you can set that up later.**
 
-Open http://localhost:5173 and confirm:
-- The site shows the owner's name (not "Your Name")
-- Chat responds as the owner
-
-Tell the user: **"Chat is working. Calendar and email are optional — want
-to set them up now or later?"**
-
-If **later** or **skip** → done. If **now** → continue to step 4.
+Done — setup complete for path A.
 
 ---
 
-## Step 4 — Google Calendar and email (optional)
+## Step 3B — Google Calendar and email (deploy path only)
 
-Only reach this step if the user said "now" in step 3. Ask for each
-credential one at a time:
+Skip this step if the user chose path A.
 
-**4a.** Ask:
+Ask for each credential one at a time. The user must have `npm run dev`
+running for the setup API. If the server isn't running, tell the user:
+**"Run `npm run dev` in a separate terminal, then tell me when it's ready."**
+
+**3B-a.** Ask:
 > Paste your Google OAuth Client ID (looks like `...apps.googleusercontent.com`).
 
 Save it as `GOOGLE_OAUTH_CLIENT_ID`.
@@ -156,7 +168,7 @@ After saving, tell the user to check these three things in
 3. **Same project** — the OAuth Client ID and consent screen must be in
    the same Google Cloud project.
 
-**4b.** Ask:
+**3B-b.** Ask:
 > I need your Google service account JSON key. Two options:
 >
 > **A) Drop the JSON file in the repo root** (e.g. `service-account.json`)
@@ -169,24 +181,24 @@ After saving, tell the user to check these three things in
 If they give a file path, read it. If they paste raw JSON, use it directly.
 Either way, base64-encode the JSON and save as `GOOGLE_SERVICE_ACCOUNT_KEY`.
 
-**4c.** Ask:
+**3B-c.** Ask:
 > Which calendar(s) should I read for availability? (comma-separated email
 > addresses, e.g. `you@gmail.com`)
 
 Save as `GOOGLE_CALENDAR_IDS`.
 
-**4d.** Ask:
+**3B-d.** Ask:
 > Which calendar should booking events be written to? (usually the same as
 > above)
 
 Save as `GOOGLE_CALENDAR_WRITE_ID`.
 
-**4e.** Ask:
+**3B-e.** Ask:
 > What email should contact form messages go to?
 
 Save as `CONTACT_EMAIL`.
 
-**4f.** Save all at once:
+**3B-f.** Save all at once:
 ```bash
 curl -s -X POST http://127.0.0.1:8787/api/setup/save \
   -H 'Content-Type: application/json' \
@@ -202,7 +214,7 @@ curl -s -X POST http://127.0.0.1:8787/api/setup/save \
   }'
 ```
 
-**4g.** Test Google Calendar:
+**3B-g.** Test Google Calendar:
 ```bash
 curl -s -X POST http://127.0.0.1:8787/api/setup/test/google-calendar \
   -H 'Content-Type: application/json' \
@@ -214,27 +226,19 @@ If the test fails, show the error and help debug. Common issues:
 - Service account not shared on the calendar
 - Wrong calendar ID
 
-**4h.** Tell the user: **"Restart `npm run dev` to pick up the new
-credentials."** Done.
+**3B-h.** Tell the user:
 
----
+> **Your site is ready for deployment! All credentials are saved.
+> The deploy pipeline is coming soon — when it lands, it'll be a single
+> command to go live.**
 
-## After setup — what works locally
-
-Tell the user:
-
-> **What works locally:** Chat with the AI, calendar UI, contact form
-> submission.
->
-> **What needs deployment:** Google Sign-In, email notifications
-> (booking confirmations, contact messages), and calendar event
-> creation require OpenKBS cloud infrastructure.
+Done — setup complete for path B.
 
 ---
 
 ## Rules for the agent
 
-- Show which step you're on (e.g. "**Step 2 of 5 — LLM key**") when
+- Show which step you're on (e.g. "**Step 2 of 4 — Career data**") when
   moving to the next step.
 - Ask one question at a time. Wait for the answer before moving on.
 - Never invent data — only use what the user provides.
