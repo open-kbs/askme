@@ -124,6 +124,18 @@ credential one at a time:
 
 Save it as `GOOGLE_OAUTH_CLIENT_ID`.
 
+After saving, tell the user to check these three things in
+[Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials):
+
+1. **Authorized JavaScript origins** — the OAuth Client ID must include
+   `http://localhost:5173` (no trailing slash, `http` not `https`, port
+   must match).
+2. **OAuth consent screen → Test users** — if publishing status is
+   "Testing", the Google account they sign in with must be listed under
+   test users.
+3. **Same project** — the OAuth Client ID and consent screen must be in
+   the same Google Cloud project.
+
 **4b.** Ask:
 > I need your Google service account JSON key. Two options:
 >
