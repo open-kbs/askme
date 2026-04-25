@@ -45,6 +45,14 @@ now)"**
 
 If they provide one, copy to `assets/avatar.png`. If they skip, move on.
 
+Then ask:
+
+> **What are your LinkedIn and GitHub URLs?** (paste both, or skip if
+> you don't want them in the nav)
+
+Save to `config.json` → `social.linkedin` and `social.github` (or `null`
+if skipped).
+
 Do not proceed until the user confirms the profile data.
 
 ---
