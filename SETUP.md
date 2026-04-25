@@ -3,6 +3,17 @@
 Follow these steps in order. Ask one question at a time — do not batch
 multiple questions into a single prompt.
 
+Before starting, show the user the full plan:
+
+> **Setup steps:**
+> 1. Career data — fill in your profile from a LinkedIn PDF or bio
+> 2. Avatar & social links
+> 3. LLM key — connect the chat
+> 4. Verify — confirm everything works
+> 5. Google Calendar & email (optional)
+>
+> Let's start with step 1.
+
 After setup, this file is no longer needed — see
 [AGENTS.md](./AGENTS.md) for ongoing development guidance.
 
@@ -208,6 +219,8 @@ credentials."** Done.
 
 ## Rules for the agent
 
+- Show which step you're on (e.g. "**Step 2 of 5 — LLM key**") when
+  moving to the next step.
 - Ask one question at a time. Wait for the answer before moving on.
 - Never invent data — only use what the user provides.
 - Never commit. Show diffs and let the user review.
