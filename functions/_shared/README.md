@@ -1,6 +1,6 @@
 # Shared helpers
 
-Modules here are copied into each function bundle at deploy time by `scripts/deploy-fn.sh` (the `_shared/` directory is symlinked or bundled alongside each function's `index.mjs`).
+Modules here are copied into each function bundle at deploy time.
 
 Contents:
 

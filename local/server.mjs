@@ -46,7 +46,7 @@ const sharedSrc = path.join(repoRoot, 'functions', '_shared');
 
 for (const fn of FUNCTIONS) {
   const fnDir = path.join(repoRoot, 'functions', fn);
-  // _env.mjs stub — the real one is generated at deploy time by deploy-fn.sh.
+  // _env.mjs stub — the real one is generated at deploy time.
   // Locally we already loaded .env.local via dotenv, so this is a no-op.
   fs.writeFileSync(
     path.join(fnDir, '_env.mjs'),

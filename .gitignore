@@ -4,8 +4,8 @@ node_modules/
 !.claude
 !.env.example
 
-# Bundled-at-deploy-time artifacts — each function gets a copy of _shared/ + _env.mjs
-# written by scripts/deploy-fn.sh. Never commit the copies.
+# Bundled-at-deploy-time artifacts — each function gets a copy of _shared/ + _env.mjs.
+# Never commit the copies.
 functions/*/_shared/
 functions/*/_env.mjs
 functions/*/*.zip
