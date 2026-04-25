@@ -3,7 +3,9 @@
 Follow these steps in order. Ask one question at a time — do not batch
 multiple questions into a single prompt.
 
-Before starting, show the user the full plan:
+Before starting, run `npm install` if `node_modules/` doesn't exist.
+
+Then show the user the full plan:
 
 > **Setup steps:**
 > 1. Career data — fill in your profile from a LinkedIn PDF or bio
