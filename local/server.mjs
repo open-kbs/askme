@@ -149,7 +149,7 @@ app.on(['GET', 'POST', 'OPTIONS'], '/api-contact', (c) =>
 
 app.get('/health', (c) => c.json({ ok: true }));
 
-// Setup wizard backend — local-only, loopback-gated inside the module.
+// Setup API — local-only, loopback-gated inside the module.
 registerSetupRoutes(app, { repoRoot });
 
 const port = Number(process.env.LOCAL_PORT || 8787);

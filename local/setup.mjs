@@ -33,7 +33,7 @@ const OPTIONAL_ENV = [
 ];
 
 // Fields whose default value in the committed `config.json` means "not yet
-// configured" — wizard pops up until the owner replaces them.
+// configured" — setup is needed until the owner replaces them.
 const PLACEHOLDER_MARKERS = [
   { path: 'owner.name', placeholder: 'Your Name' },
   { path: 'owner.title', placeholder: 'Your Title' },
@@ -115,22 +115,21 @@ export function registerSetupRoutes(app, { repoRoot }) {
     });
   });
 
-  // Current values — pre-fill the wizard form (secrets redacted).
+  // Current values — secrets shown as present/absent, never raw.
   setup.get('/values', (c) => {
     const config = readConfig(repoRoot);
     const envPath = path.join(repoRoot, '.env.local');
     const env = fs.existsSync(envPath)
       ? parseDotenv(fs.readFileSync(envPath, 'utf8'))
       : {};
-    // Send the whole config back — wizard only edits a subset but reads
-    // others for context. Secrets are marked present/absent, never raw.
+    const allKeys = [...LLM_KEY_NAMES, ...OPTIONAL_ENV];
     const envPresence = Object.fromEntries(
-      REQUIRED_ENV.map((k) => [k, Boolean(env[k])]),
+      allKeys.map((k) => [k, Boolean(env[k])]),
     );
     return c.json({ config, envPresence });
   });
 
-  // Save — merges the wizard patch into config.json and .env.local.
+  // Save — merges the patch into config.json and .env.local.
   setup.post('/save', async (c) => {
     const body = await c.req.json().catch(() => ({}));
     const configPatch = body.config || {};
