@@ -56,6 +56,19 @@ local/
 - **A tool in chat** — tools are defined inside `functions/api-chat/index.mjs`
   with the OpenKBS proxy's OpenAI-compatible tool-call format.
 
+## OpenKBS
+
+Run `openkbs init` at the start of every session to load the OpenKBS
+skill and CLI context.
+
+### Quick Reference
+
+- `openkbs deploy` — Deploy elastic services (Postgres, Storage, MQTT)
+- `openkbs site deploy` — Deploy static site
+- `openkbs fn deploy <name>` — Deploy function
+- AI Proxy: `https://proxy.openkbs.com` — Use `OPENKBS_API_KEY` for auth
+- List models: `curl https://proxy.openkbs.com/v1/models`
+
 ## Deploying to OpenKBS
 
 Install the CLI (one-time):

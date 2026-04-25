@@ -130,7 +130,6 @@ site-src/                React + Vite + Tailwind source
 local/                   Dev harness (server, PGlite shim, setup API)
 SETUP.md                 First-time setup guide (agents read this once)
 AGENTS.md                Ongoing dev guide (agents read this always)
-CLAUDE.md                One-line pointer → AGENTS.md
 ```
 
 ## Deployment
