@@ -18,7 +18,6 @@ Ask:
 Wait for the user to provide source material. Accept any of:
 - A LinkedIn PDF at `./linkedin.pdf`, `./Profile.pdf`, or `./tmp/*.pdf`
 - Pasted text (bio, resume, role list)
-- A GitHub username + short blurb
 
 Then:
 
