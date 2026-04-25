@@ -238,6 +238,7 @@ Run each step and report the result before moving on:
    ```bash
    curl -fsSL https://openkbs.com/install.sh | bash
    ```
+   After installing, load the `/openkbs` skill (see CLAUDE.md).
 2. Authenticate:
    ```bash
    openkbs login
