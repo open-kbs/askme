@@ -234,10 +234,11 @@ Tell the user:
 
 Run each step and report the result before moving on:
 
-1. Install the OpenKBS CLI (if `openkbs` isn't on PATH):
+1. Install the OpenKBS CLI:
    ```bash
    curl -fsSL https://openkbs.com/install.sh | bash
    ```
+   The script adds `openkbs` to PATH automatically — no extra checks needed.
 2. Authenticate:
    ```bash
    openkbs login
