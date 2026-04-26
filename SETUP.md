@@ -241,7 +241,9 @@ Run each step and report the result before moving on:
    ```bash
    curl -fsSL https://openkbs.com/install.sh | bash
    ```
-   The script adds `openkbs` to PATH automatically — no extra checks needed.
+   This downloads a single binary to your PATH — no sudo, no system
+   changes. It's from the same `openkbs.com` domain you'll be deploying
+   to, so it's the same trust boundary.
 2. Authenticate:
    ```bash
    openkbs login
