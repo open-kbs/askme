@@ -2,6 +2,7 @@ node_modules/
 .*
 !.gitignore
 !.claude
+.claude/skills/openkbs/
 !.env.example
 
 # Bundled-at-deploy-time artifacts — each function gets a copy of _shared/ + _env.mjs.
