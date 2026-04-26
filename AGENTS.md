@@ -71,22 +71,11 @@ skill and CLI context.
 
 ## Deploying to OpenKBS
 
-Install the CLI (one-time):
 ```bash
-curl -fsSL https://openkbs.com/install.sh | bash
+openkbs init        # load the OpenKBS skill
+npm run build       # build the frontend
+openkbs deploy      # deploy everything (services, site, functions)
 ```
-
-Then authenticate:
-```bash
-openkbs login
-```
-
-Deploy steps:
-1. `npm run build` — build the frontend
-2. `openkbs deploy` — provision elastic services (Postgres, Storage)
-3. `openkbs site deploy` — deploy the static site
-4. `openkbs fn deploy <name>` — deploy each function (`api-chat`,
-   `api-availability`, `api-bookings`, `api-contact`, `api-cleanup`)
 
 No LLM key is needed — OpenKBS injects `OPENKBS_API_KEY` automatically
 into deployed functions, which routes through the AI proxy at

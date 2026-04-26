@@ -234,41 +234,24 @@ Tell the user:
 
 Run each step and report the result before moving on:
 
-1. Install the OpenKBS CLI (if `openkbs` isn't on PATH):
+1. Load the OpenKBS skill:
    ```bash
-   curl -fsSL https://openkbs.com/install.sh | bash
+   openkbs init
    ```
-   After installing, run `openkbs init` to load the OpenKBS skill.
-2. Authenticate:
-   ```bash
-   openkbs login
-   ```
-3. Build the frontend:
+2. Build the frontend:
    ```bash
    npm run build
    ```
-4. Deploy elastic services (Postgres, Storage):
+3. Deploy everything (services, site, functions):
    ```bash
    openkbs deploy
-   ```
-5. Deploy the static site:
-   ```bash
-   openkbs site deploy
-   ```
-6. Deploy each function:
-   ```bash
-   openkbs fn deploy api-chat
-   openkbs fn deploy api-availability
-   openkbs fn deploy api-bookings
-   openkbs fn deploy api-contact
-   openkbs fn deploy api-cleanup
    ```
 
 If any step fails, show the error and help debug before continuing.
 
-After all deploys succeed, tell the user:
+After deploy succeeds, tell the user:
 
-> **Your site is live! All functions and the frontend are deployed.**
+> **Your site is live!**
 
 Done — setup complete for path B.
 
