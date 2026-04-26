@@ -238,15 +238,19 @@ Run each step and report the result before moving on:
    ```bash
    curl -fsSL https://openkbs.com/install.sh | bash
    ```
-2. Load the OpenKBS skill:
+2. Authenticate:
+   ```bash
+   openkbs login
+   ```
+3. Load the OpenKBS skill:
    ```bash
    openkbs init
    ```
-3. Build the frontend:
+4. Build the frontend:
    ```bash
    npm run build
    ```
-4. Deploy everything (services, site, functions):
+5. Deploy everything (services, site, functions):
    ```bash
    openkbs deploy
    ```
