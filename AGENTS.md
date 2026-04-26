@@ -69,18 +69,6 @@ skill and CLI context.
 - AI Proxy: `https://proxy.openkbs.com` — Use `OPENKBS_API_KEY` for auth
 - List models: `curl https://proxy.openkbs.com/v1/models`
 
-## Deploying to OpenKBS
-
-```bash
-openkbs init        # load the OpenKBS skill
-npm run build       # build the frontend
-openkbs deploy      # deploy everything (services, site, functions)
-```
-
-No LLM key is needed — OpenKBS injects `OPENKBS_API_KEY` automatically
-into deployed functions, which routes through the AI proxy at
-`https://proxy.openkbs.com`.
-
 ## Things not to do
 
 - Don't commit `.env.local`, `local/.pgdata/`, or `node_modules/`.

@@ -234,15 +234,19 @@ Tell the user:
 
 Run each step and report the result before moving on:
 
-1. Load the OpenKBS skill:
+1. Install the OpenKBS CLI (if `openkbs` isn't on PATH):
+   ```bash
+   curl -fsSL https://openkbs.com/install.sh | bash
+   ```
+2. Load the OpenKBS skill:
    ```bash
    openkbs init
    ```
-2. Build the frontend:
+3. Build the frontend:
    ```bash
    npm run build
    ```
-3. Deploy everything (services, site, functions):
+4. Deploy everything (services, site, functions):
    ```bash
    openkbs deploy
    ```
