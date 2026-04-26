@@ -234,6 +234,9 @@ If the test fails, show the error and help debug. Common issues:
 Tell the user:
 
 > **Credentials are saved. Let's deploy your site.**
+>
+> The deployment uses the OpenKBS CLI. You can read more about it at
+> https://openkbs.org
 
 Run each step and report the result before moving on:
 
