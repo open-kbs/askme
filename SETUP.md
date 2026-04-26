@@ -19,7 +19,8 @@ Ask:
 >
 > **B) Deploy to OpenKBS** — I'll collect everything needed for
 > production (Google Calendar, email). No LLM key needed — OpenKBS
-> provides one with bonus credits.
+> provides one with bonus credits. You'll also get access to
+> OpenKBS Studio where you can vibe code on your project.
 
 Wait for the user to choose, then show the steps for their path:
 
