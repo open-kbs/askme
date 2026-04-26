@@ -64,8 +64,8 @@ Then:
    - `social.*` — URLs from source material, or null
    - `starterPrompts` — 4 prompts tuned to their field (include one booking
      + one message prompt)
-4. If the user provided an avatar, copy to `assets/avatar.png` and
-   `site/assets/avatar.png`.
+4. If the user provided an avatar, copy to `assets/avatar.png` (the build copies it to `site/assets/`
+   automatically).
 
 Show the diff and ask: **"Does this look right? Also, do you have an
 avatar image you'd like to use? (drop it in the repo root or skip for

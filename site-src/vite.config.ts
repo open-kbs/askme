@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "node:path";
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, copyFileSync, mkdirSync } from "node:fs";
 import type { Plugin } from "vite";
 
 const configJsonPath = path.resolve(__dirname, "../config.json");
@@ -72,5 +72,20 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, "../site"),
     emptyOutDir: true,
+    rollupOptions: {
+      plugins: [
+        {
+          name: "copy-avatar",
+          closeBundle() {
+            const src = path.join(assetsDir, "avatar.png");
+            const dest = path.resolve(__dirname, "../site/assets/avatar.png");
+            if (existsSync(src)) {
+              mkdirSync(path.dirname(dest), { recursive: true });
+              copyFileSync(src, dest);
+            }
+          },
+        },
+      ],
+    },
   },
 });
