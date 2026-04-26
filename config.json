@@ -18,7 +18,7 @@
     "logoText": "ASK YOU",
     "metaDescription": "Ask questions about [Your Name] and get AI-powered answers.",
     "sessionStorageKey": "ask-you:session",
-    "avatarUrl": "/media/avatar.png",
+    "avatarUrl": "/assets/avatar.png",
     "cvUrl": "/media/cv.pdf"
   },
   "social": {

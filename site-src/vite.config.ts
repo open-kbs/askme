@@ -16,8 +16,13 @@ function serveMedia(): Plugin {
     name: "serve-media",
     configureServer(server) {
       server.middlewares.use((req, _res, next) => {
-        if (!req.url?.startsWith("/media/")) return next();
-        const file = req.url.slice("/media/".length);
+        let file: string | undefined;
+        if (req.url?.startsWith("/media/")) {
+          file = req.url.slice("/media/".length);
+        } else if (req.url?.startsWith("/assets/")) {
+          file = req.url.slice("/assets/".length);
+        }
+        if (!file) return next();
         const abs = path.join(assetsDir, file);
         if (!abs.startsWith(assetsDir) || !existsSync(abs)) return next();
         req.url = "/@fs/" + abs;
