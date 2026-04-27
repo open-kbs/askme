@@ -22,10 +22,10 @@ Ask:
 Wait for the user to choose, then show the steps for their path:
 
 **Path A (local):**
-> 1. Career data  2. Avatar & links  3. LLM key  4. Done
+> 1. Career data  2. Avatar  3. LinkedIn  4. GitHub  5. LLM key  6. Done
 
 **Path B (deploy):**
-> 1. Career data  2. Avatar & links  3. Google Calendar & email  4. Deploy  5. Done
+> 1. Career data  2. Avatar  3. LinkedIn  4. GitHub  5. Google Calendar & email  6. Deploy  7. Done
 
 After setup, this file is no longer needed — see
 [AGENTS.md](./AGENTS.md) for ongoing development guidance.
@@ -39,9 +39,8 @@ Ask:
 > I need your CV or resume to fill in your profile. Drop a PDF in the
 > repo root and tell me the filename.
 >
-> If you don't have a CV handy, you can export your LinkedIn profile as
-> PDF: go to your LinkedIn profile → click "More" → "Save to PDF", then
-> drop that file here.
+> If you don't have a CV handy, go to your LinkedIn profile and export
+> it as PDF, then drop that file here.
 
 Wait for the user to provide source material. Accept any of:
 - A LinkedIn PDF at `./linkedin.pdf`, `./Profile.pdf`, or `./tmp/*.pdf`
@@ -57,37 +56,54 @@ Then:
    - `sideProjects[]` — only real, publicly known projects.
    - `conditionalFacts[]` — leave empty unless user explicitly asks.
 3. Fill `config.json` fields:
-   - `owner.name`, `owner.firstName`, `owner.nameLocal` (empty if N/A)
+   - `owner.name`, `owner.firstName`, `owner.nameLocal` (the owner's
+     name in their native script, e.g. Cyrillic, Kanji, Arabic — leave
+     empty if same as `owner.name`)
    - `owner.title`, `owner.location`, `owner.timezone`, `owner.timezoneLabel`
    - `owner.bioTagline`
    - `branding.siteName` ("Ask {firstName}"), `branding.logoText` (uppercase)
    - `branding.metaDescription` — one SEO sentence
-   - `social.*` — URLs from source material, or null
    - `starterPrompts` — 4 prompts tuned to their field (include one booking
      + one message prompt)
-4. If the user provided an avatar, copy to `assets/avatar.png` (the build copies it to `site/assets/`
-   automatically).
-
-Show the diff and ask: **"Does this look right? Also, do you have an
-avatar image you'd like to use? (drop it in the repo root or skip for
-now)"**
-
-If they provide one, copy to `assets/avatar.png` and `site/assets/avatar.png`.
-If they skip, move on.
-
-Then ask:
-
-> **What are your LinkedIn and GitHub URLs?** (paste both, or skip if
-> you don't want them in the nav)
-
-Save to `config.json` → `social.linkedin` and `social.github` (or `null`
-if skipped).
+Show the diff and ask: **"Does this look right?"**
 
 Do not proceed until the user confirms the profile data.
 
 ---
 
-## Step 3A — LLM key (local path only)
+## Step 3 — Avatar
+
+Ask:
+
+> **Do you have an avatar image?** Drop it in the repo root and tell me
+> the filename, or skip for now.
+
+If they provide one, copy to `assets/avatar.png` (the build copies it to
+`site/assets/` automatically). If they skip, move on.
+
+---
+
+## Step 4 — LinkedIn
+
+Ask:
+
+> **What's your LinkedIn URL?** (or skip)
+
+Save to `config.json` → `social.linkedin` (or `null` if skipped).
+
+---
+
+## Step 5 — GitHub
+
+Ask:
+
+> **What's your GitHub URL?** (or skip)
+
+Save to `config.json` → `social.github` (or `null` if skipped).
+
+---
+
+## Step 6A — LLM key (local path only)
 
 Skip this step if the user chose path B.
 
@@ -147,7 +163,7 @@ Done — setup complete for path A.
 
 ---
 
-## Step 3B — Google Calendar and email (deploy path only)
+## Step 6B — Google Calendar and email (deploy path only)
 
 Skip this step if the user chose path A.
 
@@ -155,7 +171,7 @@ Ask for each credential one at a time. The user must have `npm run dev`
 running for the setup API. If the server isn't running, tell the user:
 **"Run `npm run dev` in a separate terminal, then tell me when it's ready."**
 
-**3B-a.** Ask:
+**6B-a.** Ask:
 > Paste your Google OAuth Client ID (looks like `...apps.googleusercontent.com`).
 
 Save it as `GOOGLE_OAUTH_CLIENT_ID`.
@@ -172,7 +188,7 @@ After saving, tell the user to check these three things in
 3. **Same project** — the OAuth Client ID and consent screen must be in
    the same Google Cloud project.
 
-**3B-b.** Ask:
+**6B-b.** Ask:
 > I need your Google service account JSON key. Two options:
 >
 > **A) Drop the JSON file in the repo root** (e.g. `service-account.json`)
@@ -185,24 +201,24 @@ After saving, tell the user to check these three things in
 If they give a file path, read it. If they paste raw JSON, use it directly.
 Either way, base64-encode the JSON and save as `GOOGLE_SERVICE_ACCOUNT_KEY`.
 
-**3B-c.** Ask:
+**6B-c.** Ask:
 > Which calendar(s) should I read for availability? (comma-separated email
 > addresses, e.g. `you@gmail.com`)
 
 Save as `GOOGLE_CALENDAR_IDS`.
 
-**3B-d.** Ask:
+**6B-d.** Ask:
 > Which calendar should booking events be written to? (usually the same as
 > above)
 
 Save as `GOOGLE_CALENDAR_WRITE_ID`.
 
-**3B-e.** Ask:
+**6B-e.** Ask:
 > What email should contact form messages go to?
 
 Save as `CONTACT_EMAIL`.
 
-**3B-f.** Save all at once:
+**6B-f.** Save all at once:
 ```bash
 curl -s -X POST http://127.0.0.1:8787/api/setup/save \
   -H 'Content-Type: application/json' \
@@ -218,7 +234,7 @@ curl -s -X POST http://127.0.0.1:8787/api/setup/save \
   }'
 ```
 
-**3B-g.** Test Google Calendar:
+**6B-g.** Test Google Calendar:
 ```bash
 curl -s -X POST http://127.0.0.1:8787/api/setup/test/google-calendar \
   -H 'Content-Type: application/json' \
@@ -230,7 +246,7 @@ If the test fails, show the error and help debug. Common issues:
 - Service account not shared on the calendar
 - Wrong calendar ID
 
-**3B-h.** Deploy to OpenKBS.
+**6B-h.** Deploy to OpenKBS.
 
 Tell the user:
 
@@ -277,8 +293,8 @@ Done — setup complete for path B.
 
 ## Rules for the agent
 
-- Show which step you're on (e.g. "**Step 2 of 4 — Career data**" for
-  path A, or "**Step 2 of 5 — Career data**" for path B) when moving to
+- Show which step you're on (e.g. "**Step 2 of 6 — Career data**" for
+  path A, or "**Step 2 of 7 — Career data**" for path B) when moving to
   the next step.
 - Ask one question at a time. Wait for the answer before moving on.
 - Never invent data — only use what the user provides.
