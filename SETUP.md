@@ -36,8 +36,12 @@ After setup, this file is no longer needed — see
 
 Ask:
 
-> Drop your LinkedIn PDF in the repo root (or paste your resume/bio here)
-> and I'll fill in your profile.
+> I need your CV or resume to fill in your profile. Drop a PDF in the
+> repo root and tell me the filename.
+>
+> If you don't have a CV handy, you can export your LinkedIn profile as
+> PDF: go to your LinkedIn profile → click "More" → "Save to PDF", then
+> drop that file here.
 
 Wait for the user to provide source material. Accept any of:
 - A LinkedIn PDF at `./linkedin.pdf`, `./Profile.pdf`, or `./tmp/*.pdf`
