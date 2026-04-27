@@ -33,11 +33,7 @@ Wait for the user to choose, then show the steps for their path:
 > 2. Avatar
 > 3. LinkedIn
 > 4. GitHub
-> 5. Google Calendar & email
-> 6. Deploy
-
-After setup, this file is no longer needed — see
-[AGENTS.md](./AGENTS.md) for ongoing development guidance.
+> 5. Deploy
 
 ---
 
@@ -168,101 +164,22 @@ in a separate terminal.
 
 After the key is verified, tell the user:
 
-> **Chat is working! Calendar, sign-in, and email notifications require
-> deployment to OpenKBS — you can set that up later.**
+> **Chat is working! You can now run `npm run dev` and try it out.**
+>
+> **Want to enable calendar, bookings, and contact form?** These are
+> optional — see the "Optional" section below, or ask me anytime later.
 
 Done — setup complete for path A.
 
 ---
 
-## Step 5B — Google Calendar and email (deploy path only)
+## Step 5B — Deploy (deploy path only)
 
 Skip this step if the user chose path A.
 
-Ask for each credential one at a time. The user must have `npm run dev`
-running for the setup API. If the server isn't running, tell the user:
-**"Run `npm run dev` in a separate terminal, then tell me when it's ready."**
-
-**5B-a.** Ask:
-> Paste your Google OAuth Client ID (looks like `...apps.googleusercontent.com`).
-
-Save it as `GOOGLE_OAUTH_CLIENT_ID`.
-
-After saving, tell the user to check these three things in
-[Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials):
-
-1. **Authorized JavaScript origins** — the OAuth Client ID must include
-   `http://localhost:5173` (no trailing slash, `http` not `https`, port
-   must match).
-2. **OAuth consent screen → Test users** — if publishing status is
-   "Testing", the Google account they sign in with must be listed under
-   test users.
-3. **Same project** — the OAuth Client ID and consent screen must be in
-   the same Google Cloud project.
-
-**5B-b.** Ask:
-> I need your Google service account JSON key. Two options:
->
-> **A) Drop the JSON file in the repo root** (e.g. `service-account.json`)
-> and tell me the filename — I'll read and base64-encode it. The key
-> stays out of the chat logs.
->
-> **B) Paste the JSON here** — I'll base64-encode it, but it will appear
-> in this conversation's logs.
-
-If they give a file path, read it. If they paste raw JSON, use it directly.
-Either way, base64-encode the JSON and save as `GOOGLE_SERVICE_ACCOUNT_KEY`.
-
-**5B-c.** Ask:
-> Which calendar(s) should I read for availability? (comma-separated email
-> addresses, e.g. `you@gmail.com`)
-
-Save as `GOOGLE_CALENDAR_IDS`.
-
-**5B-d.** Ask:
-> Which calendar should booking events be written to? (usually the same as
-> above)
-
-Save as `GOOGLE_CALENDAR_WRITE_ID`.
-
-**5B-e.** Ask:
-> What email should contact form messages go to?
-
-Save as `CONTACT_EMAIL`.
-
-**5B-f.** Save all at once:
-```bash
-curl -s -X POST http://127.0.0.1:8787/api/setup/save \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "env": {
-      "GOOGLE_OAUTH_CLIENT_ID": "...",
-      "GOOGLE_SERVICE_ACCOUNT_KEY": "...",
-      "GOOGLE_CALENDAR_IDS": "...",
-      "GOOGLE_CALENDAR_WRITE_ID": "...",
-      "APP_URL": "http://localhost:5173",
-      "CONTACT_EMAIL": "..."
-    }
-  }'
-```
-
-**5B-g.** Test Google Calendar:
-```bash
-curl -s -X POST http://127.0.0.1:8787/api/setup/test/google-calendar \
-  -H 'Content-Type: application/json' \
-  -d '{ "serviceAccountKey": "<base64_key>", "calendarIds": "<ids>" }'
-```
-
-If the test fails, show the error and help debug. Common issues:
-- Calendar API not enabled in Google Cloud Console
-- Service account not shared on the calendar
-- Wrong calendar ID
-
-**5B-h.** Deploy to OpenKBS.
-
 Tell the user:
 
-> **Credentials are saved. Let's deploy your site.**
+> **Profile is ready. Let's deploy your site.**
 >
 > The deployment uses the OpenKBS CLI. You can read more about it at
 > https://openkbs.org
@@ -297,17 +214,109 @@ If any step fails, show the error and help debug before continuing.
 
 After deploy succeeds, tell the user:
 
-> **Your site is live!**
+> **Your site is live! Chat is working.**
+>
+> **Want to enable calendar, bookings, and contact form?** These are
+> optional — see the "Optional" section below, or ask me anytime later.
 
 Done — setup complete for path B.
 
 ---
 
+## Optional — Calendar, bookings, and email
+
+These features require Google credentials. Set them up now or anytime
+later — just ask your coding agent.
+
+The user must have `npm run dev` running for the setup API. If the
+server isn't running, tell the user: **"Run `npm run dev` in a separate
+terminal, then tell me when it's ready."**
+
+**a.** Ask:
+> Paste your Google OAuth Client ID (looks like `...apps.googleusercontent.com`).
+
+Save it as `GOOGLE_OAUTH_CLIENT_ID`.
+
+After saving, tell the user to check these three things in
+[Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials):
+
+1. **Authorized JavaScript origins** — the OAuth Client ID must include
+   `http://localhost:5173` (no trailing slash, `http` not `https`, port
+   must match).
+2. **OAuth consent screen → Test users** — if publishing status is
+   "Testing", the Google account they sign in with must be listed under
+   test users.
+3. **Same project** — the OAuth Client ID and consent screen must be in
+   the same Google Cloud project.
+
+**b.** Ask:
+> I need your Google service account JSON key. Two options:
+>
+> **A) Drop the JSON file in the repo root** (e.g. `service-account.json`)
+> and tell me the filename — I'll read and base64-encode it. The key
+> stays out of the chat logs.
+>
+> **B) Paste the JSON here** — I'll base64-encode it, but it will appear
+> in this conversation's logs.
+
+If they give a file path, read it. If they paste raw JSON, use it directly.
+Either way, base64-encode the JSON and save as `GOOGLE_SERVICE_ACCOUNT_KEY`.
+
+**c.** Ask:
+> Which calendar(s) should I read for availability? (comma-separated email
+> addresses, e.g. `you@gmail.com`)
+
+Save as `GOOGLE_CALENDAR_IDS`.
+
+**d.** Ask:
+> Which calendar should booking events be written to? (usually the same as
+> above)
+
+Save as `GOOGLE_CALENDAR_WRITE_ID`.
+
+**e.** Ask:
+> What email should contact form messages go to?
+
+Save as `CONTACT_EMAIL`.
+
+**f.** Save all at once:
+```bash
+curl -s -X POST http://127.0.0.1:8787/api/setup/save \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "env": {
+      "GOOGLE_OAUTH_CLIENT_ID": "...",
+      "GOOGLE_SERVICE_ACCOUNT_KEY": "...",
+      "GOOGLE_CALENDAR_IDS": "...",
+      "GOOGLE_CALENDAR_WRITE_ID": "...",
+      "APP_URL": "http://localhost:5173",
+      "CONTACT_EMAIL": "..."
+    }
+  }'
+```
+
+**g.** Test Google Calendar:
+```bash
+curl -s -X POST http://127.0.0.1:8787/api/setup/test/google-calendar \
+  -H 'Content-Type: application/json' \
+  -d '{ "serviceAccountKey": "<base64_key>", "calendarIds": "<ids>" }'
+```
+
+If the test fails, show the error and help debug. Common issues:
+- Calendar API not enabled in Google Cloud Console
+- Service account not shared on the calendar
+- Wrong calendar ID
+
+After all credentials are saved and tested:
+
+> **Calendar, bookings, and contact form are now enabled!**
+
+---
+
 ## Rules for the agent
 
-- Show which step you're on (e.g. "**Step 1 of 5 — Career data**" for
-  path A, or "**Step 1 of 6 — Career data**" for path B) when moving to
-  the next step.
+- Show which step you're on (e.g. "**Step 1 of 5 — Career data**")
+  when moving to the next step.
 - Ask one question at a time. Wait for the answer before moving on.
 - Never invent data — only use what the user provides.
 - Never commit. Show diffs and let the user review.
