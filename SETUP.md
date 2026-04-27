@@ -7,7 +7,7 @@ Before starting, run `npm install` if `node_modules/` doesn't exist.
 
 ---
 
-## Step 1 — Choose your path
+## Choose your path
 
 Ask:
 
@@ -27,7 +27,6 @@ Wait for the user to choose, then show the steps for their path:
 > 3. LinkedIn
 > 4. GitHub
 > 5. LLM key
-> 6. Done
 
 **Path B (deploy):**
 > 1. Career data
@@ -36,14 +35,13 @@ Wait for the user to choose, then show the steps for their path:
 > 4. GitHub
 > 5. Google Calendar & email
 > 6. Deploy
-> 7. Done
 
 After setup, this file is no longer needed — see
 [AGENTS.md](./AGENTS.md) for ongoing development guidance.
 
 ---
 
-## Step 2 — Career data
+## Step 1 — Career data
 
 Ask:
 
@@ -76,14 +74,14 @@ Then:
    - `branding.metaDescription` — one SEO sentence
    - `starterPrompts` — 4 prompts tuned to their field (include one booking
      + one message prompt)
-Show a short summary (not the raw diff) — name, title, location,
-timezone, and 2–3 recent roles — then ask: **"Does this look right?"**
+Tell the user:
 
-Do not proceed until the user confirms.
+> **Profile filled in. You can always edit `config.json` and
+> `assets/career.json` later — or ask your coding agent to do it.**
 
 ---
 
-## Step 3 — Avatar
+## Step 2 — Avatar
 
 Ask:
 
@@ -95,7 +93,7 @@ If they provide one, copy to `assets/avatar.png` (the build copies it to
 
 ---
 
-## Step 4 — LinkedIn
+## Step 3 — LinkedIn
 
 Ask:
 
@@ -106,7 +104,7 @@ Save to `config.json` → `social.linkedin` (or `null` if skipped).
 
 ---
 
-## Step 5 — GitHub
+## Step 4 — GitHub
 
 Ask:
 
@@ -117,7 +115,7 @@ Save to `config.json` → `social.github` (or `null` if skipped).
 
 ---
 
-## Step 6A — LLM key (local path only)
+## Step 5A — LLM key (local path only)
 
 Skip this step if the user chose path B.
 
@@ -177,7 +175,7 @@ Done — setup complete for path A.
 
 ---
 
-## Step 6B — Google Calendar and email (deploy path only)
+## Step 5B — Google Calendar and email (deploy path only)
 
 Skip this step if the user chose path A.
 
@@ -185,7 +183,7 @@ Ask for each credential one at a time. The user must have `npm run dev`
 running for the setup API. If the server isn't running, tell the user:
 **"Run `npm run dev` in a separate terminal, then tell me when it's ready."**
 
-**6B-a.** Ask:
+**5B-a.** Ask:
 > Paste your Google OAuth Client ID (looks like `...apps.googleusercontent.com`).
 
 Save it as `GOOGLE_OAUTH_CLIENT_ID`.
@@ -202,7 +200,7 @@ After saving, tell the user to check these three things in
 3. **Same project** — the OAuth Client ID and consent screen must be in
    the same Google Cloud project.
 
-**6B-b.** Ask:
+**5B-b.** Ask:
 > I need your Google service account JSON key. Two options:
 >
 > **A) Drop the JSON file in the repo root** (e.g. `service-account.json`)
@@ -215,24 +213,24 @@ After saving, tell the user to check these three things in
 If they give a file path, read it. If they paste raw JSON, use it directly.
 Either way, base64-encode the JSON and save as `GOOGLE_SERVICE_ACCOUNT_KEY`.
 
-**6B-c.** Ask:
+**5B-c.** Ask:
 > Which calendar(s) should I read for availability? (comma-separated email
 > addresses, e.g. `you@gmail.com`)
 
 Save as `GOOGLE_CALENDAR_IDS`.
 
-**6B-d.** Ask:
+**5B-d.** Ask:
 > Which calendar should booking events be written to? (usually the same as
 > above)
 
 Save as `GOOGLE_CALENDAR_WRITE_ID`.
 
-**6B-e.** Ask:
+**5B-e.** Ask:
 > What email should contact form messages go to?
 
 Save as `CONTACT_EMAIL`.
 
-**6B-f.** Save all at once:
+**5B-f.** Save all at once:
 ```bash
 curl -s -X POST http://127.0.0.1:8787/api/setup/save \
   -H 'Content-Type: application/json' \
@@ -248,7 +246,7 @@ curl -s -X POST http://127.0.0.1:8787/api/setup/save \
   }'
 ```
 
-**6B-g.** Test Google Calendar:
+**5B-g.** Test Google Calendar:
 ```bash
 curl -s -X POST http://127.0.0.1:8787/api/setup/test/google-calendar \
   -H 'Content-Type: application/json' \
@@ -260,7 +258,7 @@ If the test fails, show the error and help debug. Common issues:
 - Service account not shared on the calendar
 - Wrong calendar ID
 
-**6B-h.** Deploy to OpenKBS.
+**5B-h.** Deploy to OpenKBS.
 
 Tell the user:
 
@@ -307,8 +305,8 @@ Done — setup complete for path B.
 
 ## Rules for the agent
 
-- Show which step you're on (e.g. "**Step 2 of 6 — Career data**" for
-  path A, or "**Step 2 of 7 — Career data**" for path B) when moving to
+- Show which step you're on (e.g. "**Step 1 of 5 — Career data**" for
+  path A, or "**Step 1 of 6 — Career data**" for path B) when moving to
   the next step.
 - Ask one question at a time. Wait for the answer before moving on.
 - Never invent data — only use what the user provides.
