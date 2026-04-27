@@ -22,10 +22,21 @@ Ask:
 Wait for the user to choose, then show the steps for their path:
 
 **Path A (local):**
-> 1. Career data  2. Avatar  3. LinkedIn  4. GitHub  5. LLM key  6. Done
+> 1. Career data
+> 2. Avatar
+> 3. LinkedIn
+> 4. GitHub
+> 5. LLM key
+> 6. Done
 
 **Path B (deploy):**
-> 1. Career data  2. Avatar  3. LinkedIn  4. GitHub  5. Google Calendar & email  6. Deploy  7. Done
+> 1. Career data
+> 2. Avatar
+> 3. LinkedIn
+> 4. GitHub
+> 5. Google Calendar & email
+> 6. Deploy
+> 7. Done
 
 After setup, this file is no longer needed — see
 [AGENTS.md](./AGENTS.md) for ongoing development guidance.
@@ -65,9 +76,10 @@ Then:
    - `branding.metaDescription` — one SEO sentence
    - `starterPrompts` — 4 prompts tuned to their field (include one booking
      + one message prompt)
-Show the diff and ask: **"Does this look right?"**
+Show a short summary (not the raw diff) — name, title, location,
+timezone, and 2–3 recent roles — then ask: **"Does this look right?"**
 
-Do not proceed until the user confirms the profile data.
+Do not proceed until the user confirms.
 
 ---
 
@@ -87,7 +99,8 @@ If they provide one, copy to `assets/avatar.png` (the build copies it to
 
 Ask:
 
-> **What's your LinkedIn URL?** (or skip)
+> **What's your LinkedIn URL?** This will show as a link in your site's
+> nav bar. (or skip)
 
 Save to `config.json` → `social.linkedin` (or `null` if skipped).
 
@@ -97,7 +110,8 @@ Save to `config.json` → `social.linkedin` (or `null` if skipped).
 
 Ask:
 
-> **What's your GitHub URL?** (or skip)
+> **What's your GitHub URL?** This will show as a link in your site's
+> nav bar. (or skip)
 
 Save to `config.json` → `social.github` (or `null` if skipped).
 
