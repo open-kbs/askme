@@ -13,14 +13,11 @@ Ask:
 
 > **How do you want to run your site?**
 >
-> **A) Local only** — run on your machine with your own OpenAI key.
-> Chat works immediately. Calendar, sign-in, and email require
-> deployment later.
+> **[A] Local** — run on your machine with your own OpenAI key.
 >
-> **B) Deploy to OpenKBS** — I'll collect everything needed for
-> production (Google Calendar, email). No LLM key needed — OpenKBS
-> provides one with bonus credits. You'll also get access to
-> OpenKBS Studio where you can vibe code on your project.
+> **[B] Deploy to OpenKBS** — no LLM key needed, OpenKBS provides one
+> with bonus credits. You'll also get access to OpenKBS Studio where
+> you can vibe code on your project.
 
 Wait for the user to choose, then show the steps for their path:
 
