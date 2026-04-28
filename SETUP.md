@@ -205,9 +205,9 @@ Run each step and report the result before moving on:
    ```bash
    npm run build
    ```
-5. Deploy everything (services, site, functions):
+5. Deploy everything (builds frontend, bundles functions, deploys):
    ```bash
-   openkbs deploy
+   npm run deploy
    ```
 
 If any step fails, show the error and help debug before continuing.

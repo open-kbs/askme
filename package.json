@@ -10,7 +10,9 @@
     "dev": "concurrently -n api,web -c cyan,magenta \"npm:dev:api\" \"npm:dev:web\"",
     "dev:api": "node local/server.mjs",
     "dev:web": "npm --prefix site-src run dev",
-    "build": "npm --prefix site-src run build"
+    "build": "npm --prefix site-src run build",
+    "predeploy": "bash scripts/bundle-functions.sh",
+    "deploy": "npm run build && npm run predeploy && openkbs deploy"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.2.13",
