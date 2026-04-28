@@ -117,14 +117,13 @@ Skip this step if the user chose path B.
 
 Ask:
 
-> The chat needs an LLM key. You have two options:
+> The chat needs an OpenAI API key. You have two options:
 >
 > **A) Paste it here** — I'll save and test it automatically. Note: the
 > key will appear in this conversation's logs.
 >
 > **B) Add it yourself** — open `.env.local` and add
-> `OPENAI_API_KEY=sk-...` or `OPENKBS_API_KEY=...`, then tell me when
-> it's done.
+> `OPENAI_API_KEY=sk-...`, then tell me when it's done.
 >
 > Which do you prefer?
 
@@ -132,25 +131,22 @@ Wait for the user to choose.
 
 **If option A (paste):**
 
-1. Detect the type: starts with `sk-` → `OPENAI_API_KEY`, otherwise →
-   `OPENKBS_API_KEY`.
-2. Save via the setup API (the user must have `npm run dev` running):
+1. Save as `OPENAI_API_KEY` via the setup API (the user must have `npm run dev` running):
    ```bash
    curl -s -X POST http://127.0.0.1:8787/api/setup/save \
      -H 'Content-Type: application/json' \
-     -d '{ "env": { "<KEY_NAME>": "<value>" } }'
+     -d '{ "env": { "OPENAI_API_KEY": "<value>" } }'
    ```
-3. If the save fails because the server isn't running, tell the user:
+2. If the save fails because the server isn't running, tell the user:
    **"Run `npm run dev` in a separate terminal, then tell me when it's
    ready."**
-4. Test:
+3. Test:
    ```bash
    curl -s -X POST http://127.0.0.1:8787/api/setup/test/llm \
      -H 'Content-Type: application/json' \
      -d '{ "apiKey": "<value>", "provider": "openai" }'
    ```
-   Omit `"provider"` for OpenKBS keys.
-5. If test fails, show the error and ask the user to check the key.
+4. If test fails, show the error and ask the user to check the key.
 
 **If option B (manual):**
 
