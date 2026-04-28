@@ -1,8 +1,8 @@
 # Personal AI Site — template
 
-An open-source template for a chat-first personal website. Visitors chat
-with an AI version of you that can check your calendar, book calls, and
-send you messages.
+An open-source template for a chat-first professional portfolio.
+Visitors chat with an AI version of you instead of reading a static
+resume — it can check your calendar, book calls, and take messages.
 
 ## What you get
 
