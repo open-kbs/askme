@@ -1,9 +1,0 @@
-{
-  "name": "openkbs-personal-ai-chat",
-  "version": "0.0.1",
-  "type": "module",
-  "private": true,
-  "dependencies": {
-    "pg": "^8.13.1"
-  }
-}

@@ -41,7 +41,7 @@ if (!process.env.DATABASE_URL && !process.env.LOCAL_DB_FILE) {
 process.env.LOCAL_DB_SHIM_PATH = path.join(repoRoot, 'local', 'db.mjs');
 
 // 2. Prep each function dir (stub _env.mjs + copy _shared/) -----------------
-const FUNCTIONS = ['api-chat', 'api-availability', 'api-bookings', 'api-contact'];
+const FUNCTIONS = ['api'];
 const sharedSrc = path.join(repoRoot, 'functions', '_shared');
 
 for (const fn of FUNCTIONS) {
@@ -136,16 +136,7 @@ async function dispatch(fn, c) {
 // 5. Routes -----------------------------------------------------------------
 const app = new Hono();
 
-app.on(['GET', 'POST', 'OPTIONS'], '/api-chat', (c) => dispatch('api-chat', c));
-app.on(['GET', 'POST', 'OPTIONS'], '/api-availability', (c) =>
-  dispatch('api-availability', c),
-);
-app.on(['GET', 'POST', 'OPTIONS'], '/api-bookings', (c) =>
-  dispatch('api-bookings', c),
-);
-app.on(['GET', 'POST', 'OPTIONS'], '/api-contact', (c) =>
-  dispatch('api-contact', c),
-);
+app.on(['GET', 'POST', 'OPTIONS'], '/api', (c) => dispatch('api', c));
 
 app.get('/health', (c) => c.json({ ok: true }));
 
@@ -157,7 +148,7 @@ serve(
   { fetch: app.fetch, port, hostname: '127.0.0.1' },
   ({ port }) => {
     console.log(`[local] API server listening on http://127.0.0.1:${port}`);
-    console.log(`[local] routes: /api-chat /api-availability /api-bookings /api-contact /api/setup/*`);
+    console.log(`[local] routes: /api /api/setup/*`);
     if (process.env.LOCAL_DB_FILE && !process.env.DATABASE_URL) {
       console.log(`[local] using PGlite at ${process.env.LOCAL_DB_FILE}`);
     }

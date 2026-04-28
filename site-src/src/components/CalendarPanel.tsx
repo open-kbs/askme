@@ -28,7 +28,11 @@ export function CalendarPanel({ onBooked }: Props = {}) {
     setLoading(true);
     setError(null);
     try {
-      const res = await authedFetch(`/api-availability?t=${Date.now()}`);
+      const res = await authedFetch("/api", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "get-availability" }),
+      });
       const payload = await res.json();
       if (!res.ok) throw new Error(payload.error || "Failed to load availability");
       setDays(payload.days);

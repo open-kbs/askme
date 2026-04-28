@@ -28,10 +28,11 @@ export function Chat() {
       setError(null);
 
       try {
-        const res = await fetch("/api-chat", {
+        const res = await fetch("/api", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            action: "chat",
             messages: next.map((m) => ({ role: m.role, content: m.content })),
           }),
         });

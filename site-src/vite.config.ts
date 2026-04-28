@@ -60,11 +60,7 @@ export default defineConfig({
     proxy: {
       // Route API calls to the in-process Lambda server (local/server.mjs).
       // Set LOCAL_API_PORT if you change LOCAL_PORT in the api process.
-      "/api-chat": { target: "http://127.0.0.1:8787", changeOrigin: false },
-      "/api-availability": { target: "http://127.0.0.1:8787", changeOrigin: false },
-      "/api-bookings": { target: "http://127.0.0.1:8787", changeOrigin: false },
-      "/api-contact": { target: "http://127.0.0.1:8787", changeOrigin: false },
-      "/api/setup": { target: "http://127.0.0.1:8787", changeOrigin: false },
+      "/api": { target: "http://127.0.0.1:8787", changeOrigin: false },
     },
   },
   envDir: path.resolve(__dirname, ".."),

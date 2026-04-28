@@ -15,10 +15,10 @@ export function ContactForm() {
     setErrorMsg("");
 
     try {
-      const res = await fetch("/api-contact", {
+      const res = await fetch("/api", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, website }),
+        body: JSON.stringify({ action: "send-contact", name, email, message, website }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to send message");

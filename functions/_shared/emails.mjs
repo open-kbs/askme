@@ -82,8 +82,8 @@ function baseVars() {
 export async function sendApprovalRequestEmail(booking) {
   const approveSig = signAction(booking.id, 'approve');
   const rejectSig = signAction(booking.id, 'reject');
-  const approveUrl = `${APP_URL}/api-bookings?action=approve&id=${booking.id}&sig=${approveSig}`;
-  const rejectUrl = `${APP_URL}/api-bookings?action=reject&id=${booking.id}&sig=${rejectSig}`;
+  const approveUrl = `${APP_URL}/api?action=approve-booking&id=${booking.id}&sig=${approveSig}`;
+  const rejectUrl = `${APP_URL}/api?action=reject-booking&id=${booking.id}&sig=${rejectSig}`;
 
   const topicBlock = booking.topic
     ? `<p><strong>Topic:</strong> ${esc(booking.topic)}</p>`

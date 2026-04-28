@@ -76,10 +76,10 @@ export function BookingModal({
     setErrorMsg("");
 
     try {
-      const res = await authedFetch("/api-bookings", {
+      const res = await authedFetch("/api", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "create", name, email, topic, date, startTime, duration }),
+        body: JSON.stringify({ action: "create-booking", name, email, topic, date, startTime, duration }),
       });
 
       const data = await res.json();
