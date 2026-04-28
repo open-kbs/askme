@@ -28,7 +28,7 @@ git clone <this-repo> my-site && cd my-site
 Then say **"set up this project"**.
 
 The agent walks you through everything: your profile, avatar, and
-either local dev or deployment to [OpenKBS](https://openkbs.com). You
+either local dev or deployment to <a href="https://openkbs.com" target="_blank">OpenKBS</a>. You
 answer questions — the agent does the rest.
 
 ## License

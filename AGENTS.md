@@ -8,7 +8,7 @@ this repo. Humans can read it too.
 
 ## What this repo is
 
-A local-first template for a chat-first personal site. Visitors chat with an
+A template for a chat-first professional portfolio. Visitors chat with an
 AI persona of the site owner; the chat can look up calendar availability,
 request a booking, or send a contact message. Everything runs locally via
 `npm run dev` — an embedded Postgres (PGlite) and an in-process Lambda
