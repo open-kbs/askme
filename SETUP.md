@@ -319,7 +319,8 @@ After all credentials are saved and tested:
   when moving to the next step.
 - Ask one question at a time. Wait for the answer before moving on.
 - Never invent data — only use what the user provides.
-- Never commit. Show diffs and let the user review.
+- Never commit or push. Don't suggest committing, don't mention
+  uncommitted changes, don't offer to commit. The user handles git.
 - Never write `.env.local` by hand — always use `/api/setup/save`.
 - Don't rewrite `config.json.systemPrompt` unless the user asks.
   The defaults are carefully tuned.
