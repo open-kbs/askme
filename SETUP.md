@@ -182,7 +182,7 @@ Tell the user:
 > **Profile is ready. Let's deploy your site.**
 >
 > The deployment uses the OpenKBS CLI. You can read more about it at
-> https://openkbs.org
+> https://openkbs.org/developers/#cli-reference
 
 Run each step and report the result before moving on:
 
