@@ -5,7 +5,7 @@ import { config } from "../config";
 
 const links = [
   { href: "/", label: "Chat" },
-  { href: "/contact", label: "Contact" },
+  ...(config.features?.contactForm ? [{ href: "/contact", label: "Contact" }] : []),
 ];
 
 const LOGO_TEXT = config.branding.logoText;

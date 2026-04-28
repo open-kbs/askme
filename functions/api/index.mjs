@@ -14,7 +14,7 @@ import {
   sendBookingRejectedEmail,
 } from './_shared/emails.mjs';
 
-const { owner, branding } = getConfig();
+const { owner, branding, features } = getConfig();
 
 // ---------------------------------------------------------------------------
 // Shared infra
@@ -100,15 +100,15 @@ async function ensureSchema() {
 // ---------------------------------------------------------------------------
 
 const TOOLS = [
-  {
+  ...(features?.calendar ? [{
     type: 'function',
     function: {
       name: 'checkAvailability',
       description: `Check ${owner.firstName}'s real-time calendar availability for the next 7 days. Use this when someone asks about availability, free time, or wants to book a meeting. Returns available time slots in ${owner.timezoneLabel}.`,
       parameters: { type: 'object', properties: {}, additionalProperties: false },
     },
-  },
-  {
+  }] : []),
+  ...(features?.bookings ? [{
     type: 'function',
     function: {
       name: 'createBooking',
@@ -127,8 +127,8 @@ const TOOLS = [
         additionalProperties: false,
       },
     },
-  },
-  {
+  }] : []),
+  ...(features?.contactForm ? [{
     type: 'function',
     function: {
       name: 'sendMessage',
@@ -144,7 +144,7 @@ const TOOLS = [
         additionalProperties: false,
       },
     },
-  },
+  }] : []),
 ];
 
 async function runTool(name, args) {
@@ -213,8 +213,7 @@ async function callModel(messages) {
     body: JSON.stringify({
       model: 'gpt-5.4-mini',
       messages,
-      tools: TOOLS,
-      tool_choice: 'auto',
+      ...(TOOLS.length > 0 ? { tools: TOOLS, tool_choice: 'auto' } : {}),
     }),
   });
   const text = await res.text();
@@ -233,6 +232,7 @@ export async function handler(event) {
   if (method === 'GET') {
     const params = event.queryStringParameters || {};
     if (params.action === 'approve-booking' || params.action === 'reject-booking') {
+      if (!features?.bookings) return json({ error: 'Bookings are not enabled' }, 404);
       return handleBookingApproval(params);
     }
     return json({ error: 'Unknown action' }, 400);
@@ -249,9 +249,15 @@ export async function handler(event) {
 
   switch (body.action) {
     case 'chat':             return handleChat(event, body);
-    case 'get-availability': return handleAvailability(event);
-    case 'create-booking':   return handleCreateBooking(event, body);
-    case 'send-contact':     return handleSendContact(event, body);
+    case 'get-availability':
+      if (!features?.calendar) return json({ error: 'Calendar is not enabled' }, 404);
+      return handleAvailability(event);
+    case 'create-booking':
+      if (!features?.bookings) return json({ error: 'Bookings are not enabled' }, 404);
+      return handleCreateBooking(event, body);
+    case 'send-contact':
+      if (!features?.contactForm) return json({ error: 'Contact form is not enabled' }, 404);
+      return handleSendContact(event, body);
     default:                 return json({ error: 'Unknown action' }, 400);
   }
 }

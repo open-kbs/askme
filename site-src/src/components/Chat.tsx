@@ -6,7 +6,14 @@ function generateId() {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
 
-const STARTER_PROMPTS = config.starterPrompts;
+const CALENDAR_PROMPTS = new Set(["Are you free this week?", "Book a call"]);
+const CONTACT_PROMPTS = new Set(["Send a message"]);
+
+const STARTER_PROMPTS = config.starterPrompts.filter((p: string) => {
+  if (CALENDAR_PROMPTS.has(p) && !config.features?.calendar && !config.features?.bookings) return false;
+  if (CONTACT_PROMPTS.has(p) && !config.features?.contactForm) return false;
+  return true;
+});
 
 export function Chat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);

@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getConfig } from './config.mjs';
 
-const { owner, branding, social, systemPrompt } = getConfig();
+const { owner, branding, social, systemPrompt, features } = getConfig();
 
 function loadCareerData() {
   const here = dirname(fileURLToPath(import.meta.url));
@@ -106,15 +106,23 @@ Reserved facts (do NOT volunteer — only mention when explicitly triggered):
 ${reservedFactsBlock}` : ''}
 
 About this website:
-${bulletList(fillAll(systemPrompt.aboutSite))}
-
-Tools you have access to:
-- checkAvailability: checks my real Google Calendar and returns available time slots for the next 7 days. ALWAYS use this tool when someone asks about my availability or wants to book — never guess or make up times.
-- createBooking: creates a booking request. Before calling this, make sure you have the visitor's name, email, preferred date (dd-mm-yyyy), start time (HH:MM, 24h ${owner.timezoneLabel}), and duration (30 or 60 minutes). The topic is optional. The booking goes to me for approval — the visitor gets an email once I confirm.
-- sendMessage: sends a message/email to ${owner.firstName} on behalf of the visitor. Collect the visitor's name, email, and message before calling this. Use this when someone wants to contact ${owner.firstName}, send a message, or reach out.
-
+${bulletList(fillAll(systemPrompt.aboutSite.filter((line) => {
+    if (!features?.contactForm && line.includes('Contact page')) return false;
+    if (!features?.calendar && line.includes('Availability')) return false;
+    return true;
+  })))}
+${(() => {
+    const tools = [];
+    if (features?.calendar) tools.push(`- checkAvailability: checks my real Google Calendar and returns available time slots for the next 7 days. ALWAYS use this tool when someone asks about my availability or wants to book — never guess or make up times.`);
+    if (features?.bookings) tools.push(`- createBooking: creates a booking request. Before calling this, make sure you have the visitor's name, email, preferred date (dd-mm-yyyy), start time (HH:MM, 24h ${owner.timezoneLabel}), and duration (30 or 60 minutes). The topic is optional. The booking goes to me for approval — the visitor gets an email once I confirm.`);
+    if (features?.contactForm) tools.push(`- sendMessage: sends a message/email to ${owner.firstName} on behalf of the visitor. Collect the visitor's name, email, and message before calling this. Use this when someone wants to contact ${owner.firstName}, send a message, or reach out.`);
+    return tools.length > 0 ? `\nTools you have access to:\n${tools.join('\n')}\n` : '';
+  })()}
 Guidelines:
-${bulletList(fillAll(systemPrompt.guidelines))}
+${bulletList(fillAll(systemPrompt.guidelines.filter((g) => {
+    if (!features?.bookings && g.includes('book a call')) return false;
+    return true;
+  })))}
 
 Honest-scope rules (strict):
 - ${fillTemplate(systemPrompt.honestScope.intro)}

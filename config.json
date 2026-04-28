@@ -1,4 +1,9 @@
 {
+  "features": {
+    "calendar": true,
+    "bookings": true,
+    "contactForm": true
+  },
   "owner": {
     "name": "Your Name",
     "nameLocal": "",
