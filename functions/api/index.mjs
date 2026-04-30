@@ -224,7 +224,13 @@ async function callModel(messages) {
     err.creditsExhausted = isCredits;
     throw err;
   }
-  const parsed = JSON.parse(text);
+  let parsed;
+  try { parsed = JSON.parse(text); } catch {
+    const isCredits = /credit|insufficient|balance|quota/i.test(text);
+    const err = new Error(isCredits ? 'credits_exhausted' : `LLM returned non-JSON: ${text.slice(0, 120)}`);
+    err.creditsExhausted = isCredits;
+    throw err;
+  }
   if (parsed.error) {
     const msg = typeof parsed.error === 'string' ? parsed.error : JSON.stringify(parsed.error);
     const isCredits = /credit|insufficient|balance|quota/i.test(msg);
