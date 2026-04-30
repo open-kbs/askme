@@ -238,6 +238,13 @@ async function callModel(messages) {
     err.creditsExhausted = isCredits;
     throw err;
   }
+  if (!parsed.choices?.[0]?.message) {
+    console.error('LLM returned unexpected shape:', text.slice(0, 500));
+    const isCredits = /credit|insufficient|balance|quota/i.test(text);
+    const err = new Error(isCredits ? 'credits_exhausted' : 'Empty response from model');
+    err.creditsExhausted = isCredits;
+    throw err;
+  }
   return parsed;
 }
 
@@ -309,9 +316,7 @@ async function handleChat(event, body) {
   try {
     for (let step = 0; step < 5; step++) {
       const response = await callModel(messages);
-      const choice = response.choices?.[0];
-      const message = choice?.message;
-      if (!message) throw new Error('Empty response from model');
+      const message = response.choices[0].message;
 
       messages.push(message);
 
