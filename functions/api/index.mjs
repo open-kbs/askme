@@ -217,7 +217,13 @@ async function callModel(messages) {
     }),
   });
   const text = await res.text();
-  if (!res.ok) throw new Error(`LLM ${res.status}: ${text}`);
+  if (!res.ok) {
+    const isCredits = res.status === 402 ||
+      /credit|insufficient|balance|quota/i.test(text);
+    const err = new Error(`LLM ${res.status}: ${text}`);
+    err.creditsExhausted = isCredits;
+    throw err;
+  }
   return JSON.parse(text);
 }
 
@@ -324,6 +330,9 @@ async function handleChat(event, body) {
     });
   } catch (err) {
     console.error('chat error:', err);
+    if (err?.creditsExhausted) {
+      return json({ error: 'credits_exhausted' }, 402);
+    }
     return json({ error: err instanceof Error ? err.message : 'chat failed' }, 500);
   }
 }

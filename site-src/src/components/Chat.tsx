@@ -20,6 +20,7 @@ export function Chat() {
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [creditsExhausted, setCreditsExhausted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,6 +45,10 @@ export function Chat() {
           }),
         });
         const data = await res.json();
+        if (res.status === 402 || data.error === "credits_exhausted") {
+          setCreditsExhausted(true);
+          return;
+        }
         if (!res.ok) throw new Error(data.error || "Chat failed");
 
         const assistantMsg: ChatMessage = {
@@ -124,7 +129,20 @@ export function Chat() {
         <div ref={messagesEndRef} />
       </div>
 
-      {error && (
+      {creditsExhausted && (
+        <div className="mt-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
+          <p className="text-sm font-medium text-amber-500">Chat credits have been used up</p>
+          <p className="text-xs text-amber-500/80 mt-1">
+            Visit your{" "}
+            <a href="https://openkbs.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-400">
+              OpenKBS dashboard
+            </a>{" "}
+            to add more credits, or set your own <code className="text-[0.7rem]">OPENAI_API_KEY</code> in the environment.
+          </p>
+        </div>
+      )}
+
+      {error && !creditsExhausted && (
         <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/20">
           <p className="text-xs text-red-500">{error}</p>
         </div>
@@ -144,11 +162,11 @@ export function Chat() {
             placeholder="Ask me anything..."
             rows={1}
             className="flex-1 rounded-2xl border border-foreground/15 bg-background px-3 md:px-4 py-2.5 md:py-3 text-base outline-none focus:border-accent transition-colors resize-none max-h-32 overflow-y-auto"
-            disabled={isSending}
+            disabled={isSending || creditsExhausted}
           />
           <button
             type="submit"
-            disabled={isSending || !input.trim()}
+            disabled={isSending || creditsExhausted || !input.trim()}
             className="rounded-full bg-accent px-5 py-3 text-base font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             Send
