@@ -19,11 +19,8 @@ jobs:
           node-version: "24"
           cache: npm
 
-      - name: Install root dependencies
+      - name: Install dependencies
         run: npm ci
-
-      - name: Install frontend dependencies
-        run: npm ci --prefix site-src
 
       - name: Typecheck and build frontend
         run: npm run build
