@@ -182,13 +182,17 @@ Tell the user:
 
 Run each step and report the result before moving on:
 
-1. Install the OpenKBS CLI:
+1. Install or update the OpenKBS CLI:
    ```bash
-   curl -fsSL https://openkbs.com/install.sh | bash
+   if command -v openkbs &>/dev/null; then
+     openkbs update
+   else
+     curl -fsSL https://openkbs.com/install.sh | bash
+   fi
    ```
-   This downloads a single binary to your PATH — no sudo, no system
-   changes. It's from the same `openkbs.com` domain you'll be deploying
-   to, so it's the same trust boundary.
+   If the CLI is already installed, `openkbs update` refreshes the
+   binary and project skill files. Otherwise, `install.sh` downloads a
+   single binary to your PATH — no sudo, no system changes.
 2. Authenticate:
    ```bash
    openkbs login
