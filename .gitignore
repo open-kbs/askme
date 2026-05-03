@@ -20,5 +20,4 @@ coverage/
 
 # Vite intermediate build artifacts
 site-src/dist/
-site-src/node_modules/
 site-src/tsconfig*.tsbuildinfo
