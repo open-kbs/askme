@@ -1,8 +1,18 @@
-# Personal AI Site
+# AskMe
 
-A template for building a chat-first professional portfolio. Instead of reading a static resume, visitors chat with an AI version of you — it answers questions about your career, checks your Google Calendar availability, books calls (with a two-phase approve/reject flow), and takes messages through a contact form. All features are optional and can be toggled independently.
+**Your portfolio, as a conversation.**
 
-> **⚠️ Cost warning:** The AI chat makes real LLM API calls (OpenAI or via the OpenKBS proxy). Each conversation costs tokens. Monitor your usage and set billing limits on your provider account.
+Nobody reads resumes. With AskMe, visitors chat with an AI version of you — it knows your career, answers questions in your voice, checks your Google Calendar, books calls, and takes messages. Clone it, drop in your CV, and deploy.
+
+- **AI chat** — career-aware conversations powered by OpenAI (or any model via the OpenKBS proxy)
+- **Calendar + bookings** — real-time availability from Google Calendar, with a two-phase approve/reject flow
+- **Contact form** — rate-limited messages straight to your inbox
+- **Agent-assisted setup** — open in Claude Code, Cursor, or Codex and say "set up this project"
+- **All features optional** — toggle calendar, bookings, and contact form independently
+
+Built with React, Vite, Tailwind CSS, and Node.js serverless functions. Runs locally with zero external dependencies (PGlite for Postgres), deploys to OpenKBS in one command.
+
+> **Cost note:** The AI chat makes real LLM API calls. Each conversation costs tokens. Monitor your usage and set billing limits on your provider account.
 
 ## Prerequisites
 
