@@ -6,22 +6,35 @@
   "description": "Open-source template for a chat-first personal site on OpenKBS",
   "license": "MIT",
   "scripts": {
-    "postinstall": "npm --prefix site-src install",
     "dev": "concurrently -n api,web -c cyan,magenta \"npm:dev:api\" \"npm:dev:web\"",
     "dev:api": "node local/server.mjs",
-    "dev:web": "npm --prefix site-src run dev",
-    "build": "npm --prefix site-src run build",
+    "dev:web": "vite site-src",
+    "build": "tsc -b site-src && vite build site-src",
     "predeploy": "bash scripts/bundle-functions.sh",
     "deploy": "npm run build && npm run predeploy && openkbs deploy"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.2.13",
-    "@hono/node-server": "^1.13.7",
+    "@fontsource/geist-mono": "^5.1.1",
+    "@fontsource/geist-sans": "^5.1.1",
+    "@fontsource/orbitron": "^5.1.1",
+    "@hono/node-server": "^2.0.2",
     "dotenv": "^16.4.7",
-    "hono": "^4.6.14",
-    "pg": "^8.13.1"
+    "hono": "^4.12.18",
+    "pg": "^8.13.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.1.1"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^9.1.2",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.3",
+    "vite": "^8.0.10"
   }
 }
