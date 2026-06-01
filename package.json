@@ -14,7 +14,7 @@
     "deploy": "npm run build && npm run predeploy && openkbs deploy"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.2.13",
+    "@electric-sql/pglite": "^0.4.6",
     "@fontsource/geist-mono": "^5.1.1",
     "@fontsource/geist-sans": "^5.1.1",
     "@fontsource/orbitron": "^5.1.1",
